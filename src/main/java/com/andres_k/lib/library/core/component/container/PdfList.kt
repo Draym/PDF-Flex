@@ -3,6 +3,9 @@ package com.andres_k.lib.library.core.component.container
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.*
+import com.andres_k.lib.library.utils.config.PdfContext
+import com.andres_k.lib.library.utils.config.PdfProperties
+import com.andres_k.lib.library.utils.data.PdfOverdrawResult
 import java.awt.Color
 
 /**
@@ -14,6 +17,7 @@ import java.awt.Color
 data class PdfList private constructor(
     private val interLine: Float?,
     override val elements: List<PdfRow>,
+    override val identifier: String?,
     override val position: Position,
     override val size: Size,
     override val bodyAlign: BodyAlign?,
@@ -24,11 +28,12 @@ data class PdfList private constructor(
     override val background: Background,
     override val borders: Borders,
     override val isBuilt: Boolean
-) : PdfContainer(elements, splitOnOverdraw, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.LIST) {
+) : PdfContainer(elements, splitOnOverdraw, identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.LIST) {
 
     constructor(
         elements: List<PdfComponent>,
         interLine: Float? = null,
+        identifier: String? = null,
         position: Position = Position.ORIGIN,
         bodyAlign: BodyAlign? = null,
         padding: Spacing = Spacing.NONE,
@@ -37,20 +42,18 @@ data class PdfList private constructor(
         color: Color? = null,
         background: Background = Background.NONE,
         borders: Borders = Borders.NONE
-    ) : this(interLine, elements.map { PdfRow(arrayListOf(it)) }, position, Size.NULL, bodyAlign, padding, margin, splitOnOverdraw, color, background, borders, false)
+    ) : this(interLine, elements.map { PdfRow(arrayListOf(it)) }, identifier, position, Size.NULL, bodyAlign, padding, margin, splitOnOverdraw, color, background, borders, false)
 
     fun rows(): List<PdfRow> = elements
 
     override fun preRenderContent(context: PdfContext, body: Box2d): PdfOverdrawResult {
         /** Try render elements **/
-        //val drawableElements: MutableList<PdfRow> = arrayListOf()
         var overdrawIndex: Int? = null
         drawRow@ for (i in elements.indices) {
             if (elements[i].hasOverdrawY(body, context.viewBody)) {
                 overdrawIndex = if (splitOnOverdraw) i else 0
                 break@drawRow
             }
-            //    drawableElements.add(elements[i])
         }
 
         /** Build List of overdraw elements **/

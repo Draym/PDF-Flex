@@ -3,6 +3,8 @@ package com.andres_k.lib.library.core.component.container
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.*
+import com.andres_k.lib.library.utils.config.PdfContext
+import com.andres_k.lib.library.utils.data.PdfOverdrawResult
 import java.awt.Color
 
 /**
@@ -13,6 +15,7 @@ import java.awt.Color
 @Suppress("DataClassPrivateConstructor")
 data class PdfView private constructor(
     override val elements: List<PdfComponent>,
+    override val identifier: String?,
     override val position: Position,
     override val size: Size,
     override val bodyAlign: BodyAlign?,
@@ -21,11 +24,12 @@ data class PdfView private constructor(
     override val color: Color?,
     override val background: Background,
     override val borders: Borders,
-    override val isBuilt: Boolean
-) : PdfContainer(elements, true, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.VIEW) {
+    override val isBuilt: Boolean,
+) : PdfContainer(elements, true, identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.VIEW) {
 
     constructor(
         elements: List<PdfComponent>,
+        identifier: String? = null,
         position: Position = Position.ORIGIN,
         size: Size = Size.NULL,
         bodyAlign: BodyAlign? = null,
@@ -33,8 +37,8 @@ data class PdfView private constructor(
         margin: Spacing = Spacing.NONE,
         color: Color? = null,
         background: Background = Background.NONE,
-        borders: Borders = Borders.NONE
-    ) : this(elements, position, size, bodyAlign, padding, margin, color, background, borders, false)
+        borders: Borders = Borders.NONE,
+    ) : this(elements, identifier, position, size, bodyAlign, padding, margin, color, background, borders, false)
 
     override fun preRenderContent(context: PdfContext, body: Box2d): PdfOverdrawResult {
         val drawElements: MutableList<PdfComponent> = arrayListOf()
@@ -43,16 +47,24 @@ data class PdfView private constructor(
         var drawHeight = 0f
 
         /** Try render elements **/
+        var hasOverdraw = false
         elements.forEach {
-            val result = it.preRender(context = context, parent = body)
-            if (result.main != null) {
-                if (drawHeight.smaller(result.main.endY())) {
-                    drawHeight = result.main.endY()
+            if (hasOverdraw || it.type == Type.PAGE_BREAK) {
+                if (hasOverdraw) {
+                    overdrawElements.add(it)
                 }
-                drawElements.add(result.main)
-            }
-            if (result.overdraw != null) {
-                overdrawElements.add(result.overdraw)
+                hasOverdraw = true
+            } else {
+                val result = it.preRender(context = context, parent = body)
+                if (result.main != null) {
+                    if (drawHeight.smaller(result.main.endY())) {
+                        drawHeight = result.main.endY()
+                    }
+                    drawElements.add(result.main)
+                }
+                if (result.overdraw != null) {
+                    overdrawElements.add(result.overdraw)
+                }
             }
         }
 
@@ -168,7 +180,7 @@ data class PdfView private constructor(
         font: FontCode?,
         background: Background?,
         borders: Borders?,
-        isBuilt: Boolean
+        isBuilt: Boolean,
     ): T {
         return this.copy(
             position = position ?: this.position,

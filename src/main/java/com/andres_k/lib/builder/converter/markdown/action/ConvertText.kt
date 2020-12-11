@@ -3,6 +3,7 @@ package com.andres_k.lib.builder.converter.markdown.action
 import com.andres_k.lib.builder.converter.PdfConverterConfig
 import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterConfig
 import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterContext
+import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.component.element.PdfText
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.getTextInNode
@@ -22,9 +23,21 @@ object ConvertText : MarkdownAction {
         markdown: MarkdownConverterConfig,
         context: MarkdownConverterContext,
     ): PdfText {
-        val text = node.getTextInNode(config.data).toString()
+        return extractText(node, config)
+    }
 
-        return PdfText(
+    fun extractText(node: ASTNode, config: PdfConverterConfig): PdfText {
+        val text = node.getTextInNode(config.data).toString()
+        val customInterpreter = config.customInterpreter[PdfComponent.Type.TEXT]
+
+        val customOutput = if (customInterpreter == null || !customInterpreter.isInterpreterValue(text)) {
+            null
+        } else {
+            val output = customInterpreter.interpret(text)
+            if (output is PdfText) output else null
+        }
+
+        return customOutput ?: PdfText(
             text = text,
             font = config.getDefaultFont(),
             fontSize = config.defaultFontSize

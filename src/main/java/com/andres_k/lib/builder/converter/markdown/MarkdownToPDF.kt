@@ -8,7 +8,7 @@ import com.andres_k.lib.library.core.property.Spacing
 import com.andres_k.lib.library.holder.PdfPage
 import com.andres_k.lib.library.utils.BaseFont
 import com.andres_k.lib.library.utils.EFont
-import com.andres_k.lib.library.utils.PdfProperties
+import com.andres_k.lib.library.utils.config.PdfProperties
 import org.apache.fontbox.ttf.TrueTypeFont
 import org.apache.pdfbox.pdmodel.font.PDType1Font
 
@@ -26,10 +26,10 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font
  * Use MarkdownConverter to generate PDFlex components from text input
  */
 class MarkdownToPDF(
-        private val content: String,
-        paddingX: Float? = null,
-        paddingY: Float? = null,
-        private val debug: Boolean = false,
+    private val content: String,
+    paddingX: Float? = null,
+    paddingY: Float? = null,
+    private val debug: Boolean = false
 ) : PdfBaseTemplate() {
     private val paddingX: Float = paddingX ?: 20f
     private val paddingY: Float = paddingY ?: 10f
@@ -53,32 +53,32 @@ class MarkdownToPDF(
 
         /** config **/
         val config = PdfConverterConfig(
-                data = content,
-                defaultFont = font,
-                defaultFontBold = fontB,
-                defaultFontItalic = fontL
+            data = content,
+            defaultFont = font,
+            defaultFontBold = fontB,
+            defaultFontItalic = fontL
         )
 
         /** PDF content **/
         val content = MarkdownConverter.markdownToPDFlex(
-                text = content,
-                config = config
+            text = content,
+            config = config
         )
         val page = PdfPage(
-                elements = content,
-                padding = Spacing(paddingY, paddingX, paddingY, paddingX)
+            elements = content,
+            padding = Spacing(paddingY, paddingX, paddingY, paddingX)
         )
         return listOf(page)
     }
 
     override fun getPdfDefaultProperties(): PdfProperties {
         return PdfProperties(
-                debugOn = debug,
-                availableFont = mapOf(
-                        BaseFont.DEFAULT.code to PDType1Font.TIMES_ROMAN,
-                        BaseFont.BOLD.code to PDType1Font.TIMES_BOLD,
-                        BaseFont.ITALIC.code to PDType1Font.TIMES_ITALIC
-                )
+            debugOn = debug,
+            availableFont = mapOf(
+                BaseFont.DEFAULT.code to PDType1Font.TIMES_ROMAN,
+                BaseFont.BOLD.code to PDType1Font.TIMES_BOLD,
+                BaseFont.ITALIC.code to PDType1Font.TIMES_ITALIC
+            )
         )
     }
 }

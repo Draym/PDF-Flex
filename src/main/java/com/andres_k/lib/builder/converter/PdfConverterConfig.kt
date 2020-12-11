@@ -1,8 +1,10 @@
 package com.andres_k.lib.builder.converter
 
+import com.andres_k.lib.builder.converter.markdown.interpreter.CustomInterpreter
 import com.andres_k.lib.builder.converter.utils.symbol.BulletPicker
 import com.andres_k.lib.builder.converter.utils.symbol.NumericalPicker
 import com.andres_k.lib.builder.converter.utils.symbol.SymbolPicker
+import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.utils.FontCode
 
 /**
@@ -20,6 +22,7 @@ data class PdfConverterConfig(
     val defaultPadding: Float = 20f,
     val defaultUnorderedList: SymbolPicker = BulletPicker(),
     val defaultOrderedList: SymbolPicker = NumericalPicker(),
+    val customInterpreter: Map<PdfComponent.Type, CustomInterpreter<*>> = emptyMap()
 ) {
 
     fun getDefaultFont(): FontCode {

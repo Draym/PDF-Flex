@@ -4,6 +4,7 @@ import com.andres_k.lib.builder.converter.PdfConverterConfig
 import com.andres_k.lib.builder.converter.markdown.action.*
 import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterConfig
 import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterContext
+import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.component.container.PdfCol
 import com.andres_k.lib.library.core.component.container.PdfRow
 import com.andres_k.lib.library.core.property.SizeAttr
@@ -66,6 +67,7 @@ object MarkdownConverter {
             MarkdownElementTypes.ATX_5 to ConvertATXTitle,
             MarkdownElementTypes.ATX_6 to ConvertATXTitle,
             MarkdownTokenTypes.HTML_TAG to ConvertHtmlTag,
+            MarkdownElementTypes.HTML_BLOCK to ConvertHtmlBlock,
             MarkdownTokenTypes.EOL to ConvertEOL,
             MarkdownTokenTypes.WHITE_SPACE to IgnoreAction,
         )
@@ -84,21 +86,27 @@ object MarkdownConverter {
         config: PdfConverterConfig,
         markdown: MarkdownConverterConfig,
         context: MarkdownConverterContext,
-    ): List<PdfRow> {
+    ): List<PdfComponent> {
         return node.children.mapIndexedNotNull { index, child ->
             val action = markdown.action(child.type)
             val content = action.run(child, index, node, config, markdown, context)
 
-            if (content != null) {
-                PdfRow(
-                    elements = listOf(
-                        PdfCol(
-                            content = content,
-                            maxWidth = SizeAttr.full()
+            when {
+                content == null -> {
+                    null
+                }
+                content.type == PdfComponent.Type.PAGE_BREAK -> content
+                else -> {
+                    PdfRow(
+                        elements = listOf(
+                            PdfCol(
+                                content = content,
+                                maxWidth = SizeAttr.full()
+                            )
                         )
                     )
-                )
-            } else null
+                }
+            }
         }
     }
 
@@ -130,7 +138,7 @@ object MarkdownConverter {
         descriptor: MarkdownFlavourDescriptor? = null,
         config: PdfConverterConfig,
         markdown: MarkdownConverterConfig = MarkdownConverterConfig.DEFAULT,
-    ): List<PdfRow> {
+    ): List<PdfComponent> {
         val node = buildNodeTree(text, descriptor)
         return analyseNodeChildren(
             node = node,

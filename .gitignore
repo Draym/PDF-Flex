@@ -5,6 +5,7 @@
 # Compiled class file
 target/
 *.class
+.flattened-pom.xml
 
 # Log file
 *.log

@@ -5,10 +5,8 @@ import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterConf
 import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterContext
 import com.andres_k.lib.library.core.component.container.PdfCol
 import com.andres_k.lib.library.core.component.element.PdfTable
-import com.andres_k.lib.library.core.component.element.PdfText
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.findChildOfType
-import org.intellij.markdown.ast.getTextInNode
 import org.intellij.markdown.flavours.gfm.GFMElementTypes
 import org.intellij.markdown.flavours.gfm.GFMTokenTypes
 
@@ -20,10 +18,10 @@ import org.intellij.markdown.flavours.gfm.GFMTokenTypes
 object ConvertTable : MarkdownAction {
 
     private fun getCols(row: ASTNode, config: PdfConverterConfig): List<PdfCol> {
-        return row.children.mapNotNull { child ->
+        return row.children.mapIndexedNotNull { index, child ->
             if (child.type == GFMTokenTypes.CELL) {
-                val text = child.getTextInNode(config.data).toString()
-                PdfCol(content = PdfText(text, config.getDefaultFont(), config.defaultFontSize))
+                val text = ConvertText.extractText(child, config)
+                PdfCol(content = text)
             } else null
         }
     }

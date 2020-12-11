@@ -2,7 +2,13 @@ package com.andres_k.lib.library.core.component.element
 
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.property.*
-import com.andres_k.lib.library.utils.*
+import com.andres_k.lib.library.utils.DrawUtils
+import com.andres_k.lib.library.utils.Font
+import com.andres_k.lib.library.utils.FontCode
+import com.andres_k.lib.library.utils.FontUtils
+import com.andres_k.lib.library.utils.config.PdfContext
+import com.andres_k.lib.library.utils.data.PdfDrawnElement
+import com.andres_k.lib.library.utils.data.PdfOverdrawResult
 import java.awt.Color
 
 /**
@@ -15,6 +21,7 @@ data class PdfPageNbAttr private constructor(
     private val numberType: NbType,
     private val font: FontCode?,
     private val fontSize: Float?,
+    override val identifier: String?,
     override val position: Position,
     override val size: Size,
     override val bodyAlign: BodyAlign?,
@@ -24,12 +31,13 @@ data class PdfPageNbAttr private constructor(
     override val background: Background,
     override val borders: Borders,
     override val isBuilt: Boolean
-) : PdfComponent(position, Size(), bodyAlign, padding, margin, color, background, borders, isBuilt, Type.PAGE_NB) {
+) : PdfComponent(identifier, position, Size(), bodyAlign, padding, margin, color, background, borders, isBuilt, Type.PAGE_NB) {
 
     constructor(
         numberType: NbType,
         font: FontCode? = null,
         fontSize: Float? = null,
+        identifier: String? = null,
         position: Position = Position.ORIGIN,
         bodyAlign: BodyAlign? = null,
         padding: Spacing = Spacing.NONE,
@@ -37,24 +45,34 @@ data class PdfPageNbAttr private constructor(
         color: Color? = null,
         background: Background = Background.NONE,
         borders: Borders = Borders.NONE,
-    ) : this(numberType, font, fontSize, position, Size(), bodyAlign, padding, margin, color, background, borders, false)
+    ) : this(numberType, font, fontSize, identifier, position, Size(), bodyAlign, padding, margin, color, background, borders, false)
 
     enum class NbType {
         CURRENT,
         TOTAL
     }
 
-    override fun drawContent(context: PdfContext, body: Box2d) {
+    override fun drawContent(context: PdfContext, body: Box2d): List<PdfDrawnElement> {
         //println("draw $text at $position")
+        val text = getValue(context)
         DrawUtils.drawText(
             stream = context.stream(),
             x = body.x,
             y = body.y - (body.height * 3 / 4),
-            text = getValue(context),
+            text = text,
             font = getFont(context).font,
             fontSize = getFontSize(context),
             color = defaultColor(context)
         )
+        return listOf(PdfDrawnElement(
+            x = body.x,
+            y = body.y,
+            xAbs = body.x - padding.left,
+            yAbs = body.y - padding.top,
+            type = type,
+            identifier = identifier,
+            text = text
+        ))
     }
 
     override fun preRenderContent(context: PdfContext, body: Box2d): PdfOverdrawResult {
@@ -93,6 +111,10 @@ data class PdfPageNbAttr private constructor(
 
     fun getFontSize(context: PdfContext): Float {
         return context.properties.getFontSize(this.fontSize)
+    }
+
+    override fun getChildren(): List<PdfComponent> {
+        return emptyList()
     }
 
     @Suppress("UNCHECKED_CAST")

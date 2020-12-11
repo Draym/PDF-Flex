@@ -4,6 +4,9 @@ import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.component.container.PdfCol
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.*
+import com.andres_k.lib.library.utils.config.PdfContext
+import com.andres_k.lib.library.utils.data.PdfDrawnElement
+import com.andres_k.lib.library.utils.data.PdfOverdrawResult
 import java.awt.Color
 
 /**
@@ -18,6 +21,7 @@ data class PdfTable private constructor(
     val headerVisible: Boolean,
     val headerVisibleOnRebuilt: Boolean,
     val splitOnOverdraw: Boolean,
+    override val identifier: String?,
     override val position: Position,
     override val size: Size,
     override val bodyAlign: BodyAlign?,
@@ -26,8 +30,8 @@ data class PdfTable private constructor(
     override val color: Color?,
     override val background: Background,
     override val borders: Borders,
-    override val isBuilt: Boolean
-) : PdfComponent(position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.TABLE) {
+    override val isBuilt: Boolean,
+) : PdfComponent(identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.TABLE) {
 
     constructor(
         header: List<PdfCol>,
@@ -35,6 +39,7 @@ data class PdfTable private constructor(
         headerVisible: Boolean = true,
         headerVisibleOnRebuilt: Boolean? = null,
         splitOnOverdraw: Boolean = true,
+        identifier: String? = null,
         position: Position = Position.ORIGIN,
         maxWidth: SizeAttr? = null,
         bodyAlign: BodyAlign? = null,
@@ -42,13 +47,14 @@ data class PdfTable private constructor(
         margin: Spacing = Spacing.NONE,
         color: Color? = null,
         background: Background = Background.NONE,
-        borders: Borders = Borders.NONE
+        borders: Borders = Borders.NONE,
     ) : this(
         header = header,
         rows = rows,
         headerVisible = headerVisible,
         headerVisibleOnRebuilt = headerVisibleOnRebuilt ?: headerVisible,
         splitOnOverdraw = splitOnOverdraw,
+        identifier = identifier,
         position = position,
         size = Size(width = maxWidth),
         bodyAlign = bodyAlign,
@@ -60,18 +66,28 @@ data class PdfTable private constructor(
         isBuilt = false
     )
 
-    override fun drawContent(context: PdfContext, body: Box2d) {
+    override fun drawContent(context: PdfContext, body: Box2d): List<PdfDrawnElement> {
+        var drawnHeaders: List<PdfDrawnElement> = emptyList()
         /** Draw Header **/
         if (headerVisible) {
-            header.forEach { col ->
+            drawnHeaders = header.map { col ->
                 col.draw(context = context, parent = body)
-            }
+            }.flatten()
         }
 
         /** Draw Table Elements **/
-        rows.forEach { row ->
-            row.forEach { col -> col.draw(context = context, parent = body) }
-        }
+        val drawnRows = rows.map { row ->
+            row.map { col -> col.draw(context = context, parent = body) }.flatten()
+        }.flatten()
+        return listOf(PdfDrawnElement(
+            x = body.x,
+            y = body.y,
+            xAbs = body.x - padding.left,
+            yAbs = body.y - padding.top,
+            type = type,
+            identifier = identifier,
+            text = null
+        )) + drawnHeaders + drawnRows
     }
 
     override fun preRenderContent(context: PdfContext, body: Box2d): PdfOverdrawResult {
@@ -247,6 +263,10 @@ data class PdfTable private constructor(
             ?: savedMaxWidth.values.sum() + padding.spacingX() + margin.spacingX(), cursorY + padding.spacingY() + margin.spacingY())
     }
 
+    override fun getChildren(): List<PdfComponent> {
+        return header + rows.flatten()
+    }
+
     @Suppress("UNCHECKED_CAST")
     override fun <T : PdfComponent> copyAbs(
         position: Position?,
@@ -258,7 +278,7 @@ data class PdfTable private constructor(
         font: FontCode?,
         background: Background?,
         borders: Borders?,
-        isBuilt: Boolean
+        isBuilt: Boolean,
     ): T {
         return this.copy(position = position ?: this.position,
             size = size ?: this.size,

@@ -1,5 +1,9 @@
-package com.andres_k.lib.library.utils
+package com.andres_k.lib.library.utils.config
 
+import com.andres_k.lib.library.utils.BaseFont
+import com.andres_k.lib.library.utils.Font
+import com.andres_k.lib.library.utils.FontCode
+import com.andres_k.lib.library.utils.FontSize
 import org.apache.pdfbox.pdmodel.font.PDFont
 import org.apache.pdfbox.pdmodel.font.PDType1Font
 import java.awt.Color
@@ -10,15 +14,15 @@ import java.awt.Color
  * @author Kevin Andres
  */
 data class PdfProperties(
-    private val defaultFont: PDType1Font = PDType1Font.HELVETICA,
-    val defaultFontSize: FontSize = 11f,
-    val defaultInterline: Float = 2f,
-    val color: Color = Color.BLACK,
-    val drawOverflowX: Boolean = true,
-    val drawOverflowY: Boolean = true,
-    val createPageOnOverdraw: Boolean = false,
-    val debugOn: Boolean = false,
-    private val availableFont: Map<FontCode, PDFont> = emptyMap(),
+        private val defaultFont: PDType1Font = PDType1Font.HELVETICA,
+        val defaultFontSize: FontSize = 11f,
+        val defaultInterline: Float = 2f,
+        val color: Color = Color.BLACK,
+        val drawOverflowX: Boolean = true,
+        val drawOverflowY: Boolean = true,
+        val createPageOnOverdraw: Boolean = false,
+        val debugOn: Boolean = false,
+        private val availableFont: Map<FontCode, PDFont> = emptyMap(),
 ) {
 
     fun getDefaultFont(): Font {

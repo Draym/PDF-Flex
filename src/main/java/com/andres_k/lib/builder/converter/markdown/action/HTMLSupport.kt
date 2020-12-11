@@ -6,5 +6,6 @@ package com.andres_k.lib.builder.converter.markdown.action
  * @author Kevin Andres
  */
 enum class HTMLSupport(val code: String) {
-    BR("<br/>")
+    LINE_BREAK("<br/>"),
+    PAGE_BREAK("<page/>")
 }

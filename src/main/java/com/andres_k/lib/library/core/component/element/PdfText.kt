@@ -2,7 +2,12 @@ package com.andres_k.lib.library.core.component.element
 
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.property.*
-import com.andres_k.lib.library.utils.*
+import com.andres_k.lib.library.utils.DrawUtils
+import com.andres_k.lib.library.utils.Font
+import com.andres_k.lib.library.utils.FontCode
+import com.andres_k.lib.library.utils.config.PdfContext
+import com.andres_k.lib.library.utils.data.PdfDrawnElement
+import com.andres_k.lib.library.utils.data.PdfOverdrawResult
 import java.awt.Color
 
 /**
@@ -15,6 +20,7 @@ data class PdfText private constructor(
     val text: String,
     val font: FontCode?,
     val fontSize: Float?,
+    override val identifier: String?,
     override val position: Position,
     override val size: Size,
     override val bodyAlign: BodyAlign?,
@@ -24,30 +30,42 @@ data class PdfText private constructor(
     override val background: Background,
     override val borders: Borders,
     override val isBuilt: Boolean,
-) : PdfComponent(position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.TEXT) {
+) : PdfComponent(identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.TEXT) {
 
     constructor(
         text: String,
         font: FontCode? = null,
         fontSize: Float? = null,
+        identifier: String? = null,
         position: Position = Position.ORIGIN,
         bodyAlign: BodyAlign? = null,
         margin: Spacing = Spacing.NONE,
         color: Color? = null,
         background: Background = Background.NONE,
         borders: Borders = Borders.NONE,
-    ) : this(text, font, fontSize, position, Size.NULL, bodyAlign, Spacing.NONE, margin, color, background, borders, false)
+    ) : this(text, font, fontSize, identifier, position, Size.NULL, bodyAlign, Spacing.NONE, margin, color, background, borders, false)
 
-    override fun drawContent(context: PdfContext, body: Box2d) {
+    override fun drawContent(context: PdfContext, body: Box2d): List<PdfDrawnElement> {
+        val drawX = body.x
+        val drawY = body.y - (body.height * 3 / 4)
         DrawUtils.drawText(
             stream = context.stream(),
-            x = body.x,
-            y = body.y - (body.height * 3 / 4),
+            x = drawX,
+            y = drawY,
             text = text,
             font = getFont(context).font,
             fontSize = getFontSize(context),
             color = defaultColor(context)
         )
+        return listOf(PdfDrawnElement(
+            x = drawX,
+            y = drawY,
+            xAbs = body.x - padding.left,
+            yAbs = body.y - padding.top,
+            type = type,
+            identifier = identifier,
+            text = text
+        ))
     }
 
     override fun preRenderContent(context: PdfContext, body: Box2d): PdfOverdrawResult {
@@ -88,7 +106,7 @@ data class PdfText private constructor(
     }
 
     fun getTextWidth(
-        context: PdfContext
+        context: PdfContext,
     ): Float {
         return this.getFont(context).font.getStringWidth(this.text) / 1000 * this.getFontSize(context)
     }
@@ -99,6 +117,9 @@ data class PdfText private constructor(
         return this.getFont(context).font.fontDescriptor.fontBoundingBox.height / 1000 * this.getFontSize(context)
     }
 
+    override fun getChildren(): List<PdfComponent> {
+        return emptyList()
+    }
 
     @Suppress("UNCHECKED_CAST")
     override fun <T : PdfComponent> copyAbs(

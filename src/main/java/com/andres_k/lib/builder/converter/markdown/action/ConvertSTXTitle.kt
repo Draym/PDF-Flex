@@ -9,7 +9,6 @@ import com.andres_k.lib.library.core.property.Spacing
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.findChildOfType
-import org.intellij.markdown.ast.getTextInNode
 
 /**
  * Created on 2020/11/02.
@@ -17,14 +16,6 @@ import org.intellij.markdown.ast.getTextInNode
  * @author Kevin Andres
  */
 object ConvertSTXTitle : MarkdownAction {
-
-    fun getATXContent(
-        content: ASTNode?,
-        config: PdfConverterConfig,
-    ): String? {
-        val text = content?.findChildOfType(MarkdownTokenTypes.TEXT)
-        return text?.getTextInNode(config.data)?.toString()
-    }
 
     override fun run(
         node: ASTNode,
@@ -35,11 +26,13 @@ object ConvertSTXTitle : MarkdownAction {
         context: MarkdownConverterContext,
     ): PdfText {
         val font = markdown.font(node.type)
-        val content = node.findChildOfType(MarkdownTokenTypes.SETEXT_CONTENT)
+        val contentText = node.findChildOfType(MarkdownTokenTypes.SETEXT_CONTENT)?.findChildOfType(MarkdownTokenTypes.TEXT)
 
-        val text = getATXContent(content, config) ?: ""
-        return PdfText(
-            text = text,
+        return if (contentText != null) {
+            ConvertText.extractText(contentText, config)
+        } else {
+            PdfText(text = "")
+        }.copy(
             font = font.first.code,
             fontSize = font.second,
             borders = Borders.BOTTOM(thickness = if (node.type == MarkdownTokenTypes.SETEXT_1) 3f else 1.5f),

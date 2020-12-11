@@ -1,4 +1,4 @@
-package com.andres_k.lib.library.utils
+package com.andres_k.lib.library.utils.data
 
 /**
  * Created on 2020/07/20.

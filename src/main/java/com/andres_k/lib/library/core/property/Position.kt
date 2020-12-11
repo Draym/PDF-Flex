@@ -2,7 +2,6 @@ package com.andres_k.lib.library.core.property
 
 import com.andres_k.lib.library.utils.bigger
 import com.andres_k.lib.library.utils.smaller
-import java.lang.IllegalArgumentException
 
 /**
  * Created on 2020/07/20.

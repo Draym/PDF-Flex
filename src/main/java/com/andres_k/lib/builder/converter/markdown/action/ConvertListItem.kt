@@ -48,9 +48,12 @@ object ConvertListItem : MarkdownAction {
             config.defaultUnorderedList.get(context.getListDepth(MarkdownTokenTypes.LIST_BULLET))
         }
 
-        val rows = MarkdownConverter.analyseNodeChildren(node, config, markdown, context.copy(
-            listDepth = MarkdownListDepth(context.getListDepth(listType) + 1, listType)
-        ))
+        val rows = MarkdownConverter.analyseNodeChildren(
+            node = node,
+            config = config,
+            markdown = markdown,
+            context = context.copy(listDepth = MarkdownListDepth(context.getListDepth(listType) + 1, listType))
+        )
 
         return PdfRow(
             listOf(

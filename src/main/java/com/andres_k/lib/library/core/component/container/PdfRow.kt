@@ -3,6 +3,8 @@ package com.andres_k.lib.library.core.component.container
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.*
+import com.andres_k.lib.library.utils.config.PdfContext
+import com.andres_k.lib.library.utils.data.PdfOverdrawResult
 import java.awt.Color
 
 /**
@@ -13,6 +15,7 @@ import java.awt.Color
 @Suppress("DataClassPrivateConstructor")
 data class PdfRow private constructor(
     override val elements: List<PdfComponent>,
+    override val identifier: String?,
     override val position: Position,
     override val size: Size,
     override val padding: Spacing,
@@ -22,19 +25,20 @@ data class PdfRow private constructor(
     override val background: Background,
     override val borders: Borders,
     override val isBuilt: Boolean
-) : PdfContainer(elements, splitOnOverdraw, position, size, null, padding, margin, color, background, borders, isBuilt, Type.ROW) {
+) : PdfContainer(elements, splitOnOverdraw, identifier, position, size, null, padding, margin, color, background, borders, isBuilt, Type.ROW) {
 
     constructor(
         elements: List<PdfComponent>,
+        identifier: String? = null,
         position: Position = Position.ORIGIN,
+        maxHeight: SizeAttr? = null,
         padding: Spacing = Spacing.NONE,
         margin: Spacing = Spacing.NONE,
-        maxHeight: SizeAttr? = null,
         splitOnOverdraw: Boolean = true,
         color: Color? = null,
         background: Background = Background.NONE,
         borders: Borders = Borders.NONE
-    ) : this(elements, position, Size(width = SizeAttr.percent(100f), height = maxHeight), padding, margin, splitOnOverdraw, color, background, borders, false)
+    ) : this(elements, identifier, position, Size(width = SizeAttr.percent(100f), height = maxHeight), padding, margin, splitOnOverdraw, color, background, borders, false)
 
     override fun preRenderContent(context: PdfContext, body: Box2d): PdfOverdrawResult {
         val drawElements: MutableList<PdfComponent> = arrayListOf()

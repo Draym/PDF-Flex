@@ -1,4 +1,4 @@
-package com.andres_k.lib.library.utils
+package com.andres_k.lib.library.utils.config
 
 import com.andres_k.lib.library.core.property.Box2d
 import org.apache.pdfbox.pdmodel.PDPageContentStream

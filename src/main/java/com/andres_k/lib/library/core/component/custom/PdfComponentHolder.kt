@@ -4,7 +4,8 @@ import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.property.Box2d
 import com.andres_k.lib.library.core.property.Box2dRequest
 import com.andres_k.lib.library.core.property.BoxSize
-import com.andres_k.lib.library.utils.PdfContext
+import com.andres_k.lib.library.utils.config.PdfContext
+import com.andres_k.lib.library.utils.data.PdfDrawnElement
 
 /**
  * Created on 2020/07/20.
@@ -21,7 +22,7 @@ data class PdfComponentHolder(val content: PdfComponent) {
         content.verifyContent()
     }
 
-    fun draw(context: PdfContext, parent: Box2d) {
+    fun draw(context: PdfContext, parent: Box2d): List<PdfDrawnElement> {
         return content.draw(context = context, parent = parent)
     }
 

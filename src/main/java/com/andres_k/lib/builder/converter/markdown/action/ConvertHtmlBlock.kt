@@ -4,8 +4,7 @@ import com.andres_k.lib.builder.converter.PdfConverterConfig
 import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterConfig
 import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterContext
 import com.andres_k.lib.library.core.component.PdfComponent
-import com.andres_k.lib.library.core.component.container.PdfRow
-import com.andres_k.lib.library.core.property.Spacing
+import com.andres_k.lib.library.core.component.element.PdfPageBreak
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.getTextInNode
 
@@ -14,7 +13,7 @@ import org.intellij.markdown.ast.getTextInNode
  *
  * @author Kevin Andres
  */
-object ConvertHtmlTag : MarkdownAction {
+object ConvertHtmlBlock : MarkdownAction {
     override fun run(
         node: ASTNode,
         nodeIndex: Int,
@@ -24,11 +23,8 @@ object ConvertHtmlTag : MarkdownAction {
         context: MarkdownConverterContext,
     ): PdfComponent? {
         return when (node.getTextInNode(config.data).toString()) {
-            HTMLSupport.LINE_BREAK.code -> {
-                PdfRow(
-                    elements = emptyList(),
-                    padding = Spacing(top = config.defaultFontSize ?: 12f)
-                )
+            HTMLSupport.PAGE_BREAK.code -> {
+                PdfPageBreak()
             }
             else -> {
                 null

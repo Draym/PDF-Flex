@@ -3,10 +3,12 @@ package com.andres_k.lib.library.holder
 import com.andres_k.lib.library.core.component.custom.PdfFooter
 import com.andres_k.lib.library.core.component.custom.PdfHeader
 import com.andres_k.lib.library.output.OutputBuilder
-import com.andres_k.lib.library.utils.PdfContextDebug
-import com.andres_k.lib.library.utils.PdfMetadata
-import com.andres_k.lib.library.utils.PdfPageProperties
-import com.andres_k.lib.library.utils.PdfProperties
+import com.andres_k.lib.library.utils.config.PdfContextDebug
+import com.andres_k.lib.library.utils.config.PdfPageProperties
+import com.andres_k.lib.library.utils.config.PdfProperties
+import com.andres_k.lib.library.utils.data.PdfDrawnPage
+import com.andres_k.lib.library.utils.data.PdfMetadata
+import com.andres_k.lib.parser.PdfExplorer
 import org.apache.pdfbox.pdmodel.PDDocument
 import org.apache.pdfbox.pdmodel.PDPageContentStream
 
@@ -16,7 +18,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream
  * @author Kevin Andres
  */
 class PdfDocument(
-    metadata: PdfMetadata = PdfMetadata.NONE
+    metadata: PdfMetadata = PdfMetadata.NONE,
 ) {
     val document: PDDocument = PDDocument()
 
@@ -81,21 +83,27 @@ class PdfDocument(
         footer: PdfFooter? = PdfFooter.NONE,
         properties: PdfProperties = PdfProperties.DEFAULT,
         debug: PdfContextDebug = PdfContextDebug.DEFAULT,
-    ) {
+    ): List<PdfDrawnPage> {
         /** Calculate final pages : done separately to know the total number of page before draw **/
         val calcPages: List<PdfPage> = calculatePages(pages, header, footer, properties, debug)
 
-        calcPages.forEachIndexed { i, page ->
+        return calcPages.mapIndexed { i, page ->
 
             /** Create content stream **/
             val contentStream = PDPageContentStream(document, page.page)
 
             /** Draw **/
-            page.draw(contentStream, PdfPageProperties(i + 1, calcPages.size), properties, debug)
+            val drawnPage = page.draw(contentStream, PdfPageProperties(i + 1, calcPages.size), properties, debug)
 
             /** Close and save page **/
             contentStream.close()
             document.addPage(page.page)
+            PdfDrawnPage(
+                index = i,
+                width = page.page.cropBox.width,
+                height = page.page.cropBox.height,
+                drawnElements = drawnPage
+            )
         }
     }
 
@@ -106,9 +114,9 @@ class PdfDocument(
         footer: PdfFooter? = PdfFooter.NONE,
         properties: PdfProperties = PdfProperties.DEFAULT,
         debug: PdfContextDebug = PdfContextDebug.DEFAULT,
-    ) {
+    ): PdfExplorer {
         builder.validateOutput()
-        computeDocument(
+        val drawnPages = computeDocument(
             pages = pages,
             header = header,
             footer = footer,
@@ -117,5 +125,6 @@ class PdfDocument(
         )
         builder.save(document)
         document.document.close()
+        return PdfExplorer(drawnPages)
     }
 }

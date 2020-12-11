@@ -6,7 +6,12 @@ import com.andres_k.lib.library.core.component.custom.PdfHeader
 import com.andres_k.lib.library.holder.PdfDocument
 import com.andres_k.lib.library.holder.PdfPage
 import com.andres_k.lib.library.output.OutputBuilder
-import com.andres_k.lib.library.utils.*
+import com.andres_k.lib.library.utils.EFont
+import com.andres_k.lib.library.utils.FontCode
+import com.andres_k.lib.library.utils.PdfFontLoader
+import com.andres_k.lib.library.utils.config.PdfProperties
+import com.andres_k.lib.library.utils.data.PdfMetadata
+import com.andres_k.lib.parser.PdfExplorer
 import org.apache.fontbox.ttf.TrueTypeFont
 import org.apache.pdfbox.pdmodel.font.PDFont
 
@@ -28,7 +33,7 @@ abstract class PdfBaseTemplate(
      *
      * @param output the generated PDF will be rendered into the output
      */
-    final override fun build(output: OutputBuilder) {
+    final override fun build(output: OutputBuilder): PdfExplorer {
         // INIT
         val desiredFont = getFontToLoad()
         val loadedFont = loadFont(desiredFont)
@@ -42,7 +47,7 @@ abstract class PdfBaseTemplate(
         val defaultProperties = getPdfDefaultProperties().copy(availableFont = loadedFont)
 
         // DRAW
-        document.draw(
+        return document.draw(
             builder = output,
             pages = pages,
             header = header,

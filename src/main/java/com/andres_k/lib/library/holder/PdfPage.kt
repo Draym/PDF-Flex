@@ -5,10 +5,11 @@ import com.andres_k.lib.library.core.component.container.PdfView
 import com.andres_k.lib.library.core.component.custom.PdfFooter
 import com.andres_k.lib.library.core.component.custom.PdfHeader
 import com.andres_k.lib.library.core.property.*
-import com.andres_k.lib.library.utils.PdfContext
-import com.andres_k.lib.library.utils.PdfContextDebug
-import com.andres_k.lib.library.utils.PdfPageProperties
-import com.andres_k.lib.library.utils.PdfProperties
+import com.andres_k.lib.library.utils.config.PdfContext
+import com.andres_k.lib.library.utils.config.PdfContextDebug
+import com.andres_k.lib.library.utils.config.PdfPageProperties
+import com.andres_k.lib.library.utils.config.PdfProperties
+import com.andres_k.lib.library.utils.data.PdfDrawnElement
 import org.apache.pdfbox.pdmodel.PDPage
 import org.apache.pdfbox.pdmodel.PDPageContentStream
 import org.apache.pdfbox.pdmodel.common.PDRectangle
@@ -24,7 +25,7 @@ data class PdfPage private constructor(
     val page: PDPage,
     val padding: Spacing,
     private val header: PdfHeader?,
-    private val footer: PdfFooter?
+    private val footer: PdfFooter?,
 ) {
 
     constructor(
@@ -58,7 +59,7 @@ data class PdfPage private constructor(
         properties: PdfProperties,
         debug: PdfContextDebug,
         defaultHeader: PdfHeader?,
-        defaultFooter: PdfFooter?
+        defaultFooter: PdfFooter?,
     ): PdfPage {
         /** Init Header & Footer */
         val header = this.header ?: defaultHeader
@@ -83,7 +84,7 @@ data class PdfPage private constructor(
     fun preRender(
         pageProperties: PdfPageProperties,
         properties: PdfProperties,
-        debug: PdfContextDebug
+        debug: PdfContextDebug,
     ): Pair<PdfPage, PdfView?> {
         /** Create Contexts **/
         val viewBody = getContentBody(header?.content, footer?.content)
@@ -108,8 +109,8 @@ data class PdfPage private constructor(
         contentStream: PDPageContentStream,
         pageProperties: PdfPageProperties,
         properties: PdfProperties,
-        debug: PdfContextDebug
-    ) {
+        debug: PdfContextDebug,
+    ): List<PdfDrawnElement> {
         //println("draw page: origin(${page.cropBox.lowerLeftX + padding.left}, ${page.cropBox.upperRightY - padding.top})")
         /** Define final header & Footer **/
         val finalHeader: PdfComponent? = header?.content?.copyAbs(Position.ORIGIN)
@@ -134,9 +135,11 @@ data class PdfPage private constructor(
         )
 
         /** Draw Header & Content & Footer **/
-        finalHeader?.draw(context = contextPage, parent = pageBody)
-        view.draw(context = contextDraw, parent = viewBody)
-        finalFooter?.draw(context = contextPage, parent = pageBody)
+        val drawnHeader = finalHeader?.draw(context = contextPage, parent = pageBody) ?: emptyList()
+        val drawnView = view.draw(context = contextDraw, parent = viewBody)
+        val drawnFooter = finalFooter?.draw(context = contextPage, parent = pageBody) ?: emptyList()
+
+        return drawnHeader + drawnView + drawnFooter
     }
 
     private fun getContentBody(header: PdfComponent?, footer: PdfComponent?): Box2d {

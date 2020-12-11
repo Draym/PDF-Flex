@@ -6,6 +6,10 @@ import com.andres_k.lib.library.core.component.custom.PdfTextLine
 import com.andres_k.lib.library.core.component.custom.addText
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.*
+import com.andres_k.lib.library.utils.config.PdfContext
+import com.andres_k.lib.library.utils.config.PdfProperties
+import com.andres_k.lib.library.utils.data.PdfDrawnElement
+import com.andres_k.lib.library.utils.data.PdfOverdrawResult
 import java.awt.Color
 
 /**
@@ -18,6 +22,7 @@ data class PdfParagraph private constructor(
     val lines: List<PdfTextLine>,
     val interLine: Float?,
     val splitOnOverdraw: Boolean,
+    override val identifier: String?,
     override val size: Size,
     override val position: Position,
     override val bodyAlign: BodyAlign?,
@@ -26,13 +31,14 @@ data class PdfParagraph private constructor(
     override val color: Color?,
     override val background: Background,
     override val borders: Borders,
-    override val isBuilt: Boolean
-) : PdfComponent(position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.PARAGRAPH) {
+    override val isBuilt: Boolean,
+) : PdfComponent(identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.PARAGRAPH) {
 
     constructor(
         lines: List<PdfTextLine>,
         maxWidth: SizeAttr? = null,
         interLine: Float? = null,
+        identifier: String? = null,
         position: Position = Position.ORIGIN,
         bodyAlign: BodyAlign? = null,
         padding: Spacing = Spacing.NONE,
@@ -40,11 +46,41 @@ data class PdfParagraph private constructor(
         splitOnOverdraw: Boolean = true,
         color: Color? = null,
         background: Background = Background.NONE,
-        borders: Borders = Borders.NONE
+        borders: Borders = Borders.NONE,
     ) : this(
         lines = lines,
         interLine = interLine,
         splitOnOverdraw = splitOnOverdraw,
+        identifier = identifier,
+        size = Size(maxWidth ?: SizeAttr.percent(100f), SizeAttr.percent(100f)),
+        position = position,
+        bodyAlign = bodyAlign,
+        padding = padding,
+        margin = margin,
+        color = color,
+        background = background,
+        borders = borders,
+        isBuilt = false
+    )
+
+    constructor(
+        text: String,
+        maxWidth: SizeAttr? = null,
+        interLine: Float? = null,
+        identifier: String? = null,
+        position: Position = Position.ORIGIN,
+        bodyAlign: BodyAlign? = null,
+        padding: Spacing = Spacing.NONE,
+        margin: Spacing = Spacing.NONE,
+        splitOnOverdraw: Boolean = true,
+        color: Color? = null,
+        background: Background = Background.NONE,
+        borders: Borders = Borders.NONE,
+    ) : this(
+        lines = text.lines().map { PdfTextLine(it) },
+        interLine = interLine,
+        splitOnOverdraw = splitOnOverdraw,
+        identifier = identifier,
         size = Size(maxWidth ?: SizeAttr.percent(100f), SizeAttr.percent(100f)),
         position = position,
         bodyAlign = bodyAlign,
@@ -80,7 +116,7 @@ data class PdfParagraph private constructor(
         val calcElements: MutableList<PdfTextLine> = arrayListOf()
         var cursorY = 0f
         finalLines.forEachIndexed { index, line ->
-            val hasInterline = if (index != finalLines.size - 1) getInterLine(context.properties) else 0f
+            val hasInterline = getInterLine(line, index == finalLines.size - 1, context.properties)
             var cursorX = 0f
 
             val items = line.items.map {
@@ -99,7 +135,6 @@ data class PdfParagraph private constructor(
     override fun calcMaxSize(context: PdfContext, parent: BoxSize): SizeResult {
         val calcWidth: Float = calcWidth(null, parent.width)!!
         val containerWidth = calcWidth - padding.spacingX()
-        val interline = getInterLine(context.properties)
 
         var maxHeight = 0f
         lines.forEachIndexed { index, line ->
@@ -107,10 +142,10 @@ data class PdfParagraph private constructor(
                 val newLines = splitWordInLines(line, containerWidth, context)
 
                 newLines.forEachIndexed { newIndex, newLine ->
-                    maxHeight += newLine.getTextHeight(context) + if (index == lines.size - 1 && newIndex == newLines.size - 1) 0f else interline
+                    maxHeight += newLine.getTextHeight(context) + getInterLine(line, index == lines.size - 1 && newIndex == newLines.size - 1, context.properties)
                 }
             } else {
-                maxHeight += line.getTextHeight(context) + if (index != lines.size - 1) interline else 0f
+                maxHeight += line.getTextHeight(context) + getInterLine(line, index == lines.size - 1, context.properties)
             }
         }
         return SizeResult(containerWidth + padding.spacingX() + margin.spacingX(), maxHeight + padding.spacingY() + margin.spacingY())
@@ -158,7 +193,7 @@ data class PdfParagraph private constructor(
             } else {
                 val font = text.getFont(context)
                 val fontSize = text.getFontSize(context)
-                val words = text.text.split(RegexUtil.buildSplitWithDelim(" ", ",", ";", ".", ":", ")", ">"))
+                val words = text.text.split(RegexUtil.buildSplitWithDelim(" ", ",", ";", ".", ":", ")", "]", "}", "\"", "'"))
 
                 words.forEach { word ->
                     val wordWidth = FontUtils.getTextWidth(word, font.font, fontSize)
@@ -174,7 +209,7 @@ data class PdfParagraph private constructor(
 
                             val linesToAdd = result.subList(1, result.size)
                             if (linesToAdd.isNotEmpty()) {
-                                newLines.addAll(linesToAdd.map { PdfTextLine.of(it) })
+                                newLines.addAll(linesToAdd.map { PdfTextLine(it) })
                                 index += linesToAdd.size
                                 cursor = FontUtils.getTextWidth(last.text, font.font, fontSize)
                             } else {
@@ -213,7 +248,7 @@ data class PdfParagraph private constructor(
             var cursorY = 0f
 
             val calcOverdrawElements = overdrawText.mapIndexed { index, line ->
-                val hasInterline = if (index != overdrawText.size - 1) getInterLine(context.properties) else 0f
+                val hasInterline = getInterLine(line, index == overdrawText.size - 1, context.properties)
 
                 val result = line.items.map { text ->
                     text.copyAbs(Position(text.position.x, cursorY), isBuilt = true) as PdfText
@@ -233,14 +268,29 @@ data class PdfParagraph private constructor(
         return PdfOverdrawResult(main = this)
     }
 
-    override fun drawContent(context: PdfContext, body: Box2d) {
-        lines.forEach { line ->
-            line.items.forEach { it.draw(context = context, parent = body) }
-        }
+    override fun drawContent(context: PdfContext, body: Box2d): List<PdfDrawnElement> {
+        val drawLines = lines.map { line ->
+            line.items.map { it.draw(context = context, parent = body) }.flatten()
+        }.flatten()
+        return listOf(PdfDrawnElement(
+            x = body.x,
+            y = body.y,
+            xAbs = body.x - padding.left,
+            yAbs = body.y - padding.top,
+            type = type,
+            identifier = identifier,
+            text = null
+        )) + drawLines
     }
 
-    private fun getInterLine(properties: PdfProperties): Float {
-        return interLine ?: properties.defaultInterline
+    private fun getInterLine(line: PdfTextLine, isLastLine: Boolean, properties: PdfProperties): Float {
+        return if (isLastLine) {
+            if (line.forceInterLine) line.interLine ?: 0f else 0f
+        } else line.interLine ?: interLine ?: properties.defaultInterline
+    }
+
+    override fun getChildren(): List<PdfComponent> {
+        return lines.map { it.items }.flatten()
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -254,7 +304,7 @@ data class PdfParagraph private constructor(
         font: FontCode?,
         background: Background?,
         borders: Borders?,
-        isBuilt: Boolean
+        isBuilt: Boolean,
     ): T {
         return this.copy(
             position = position ?: this.position,

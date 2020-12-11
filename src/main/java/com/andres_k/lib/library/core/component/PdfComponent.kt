@@ -2,6 +2,9 @@ package com.andres_k.lib.library.core.component
 
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.*
+import com.andres_k.lib.library.utils.config.PdfContext
+import com.andres_k.lib.library.utils.data.PdfDrawnElement
+import com.andres_k.lib.library.utils.data.PdfOverdrawResult
 import java.awt.Color
 
 /**
@@ -10,6 +13,7 @@ import java.awt.Color
  * @author Kevin Andres
  */
 abstract class PdfComponent(
+    open val identifier: String?,
     open val position: Position,
     open val size: Size,
     open val bodyAlign: BodyAlign?,
@@ -27,7 +31,7 @@ abstract class PdfComponent(
     abstract fun calcMaxSize(context: PdfContext, parent: BoxSize): SizeResult
 
     protected abstract fun preRenderContent(context: PdfContext, body: Box2d): PdfOverdrawResult
-    protected abstract fun drawContent(context: PdfContext, body: Box2d)
+    protected abstract fun drawContent(context: PdfContext, body: Box2d): List<PdfDrawnElement>
 
     fun build(context: PdfContext, request: Box2dRequest, parent: BoxSize): PdfComponent {
         if (isBuilt) {
@@ -43,7 +47,7 @@ abstract class PdfComponent(
         return preRenderContent(context, getDrawableContent(parent))
     }
 
-    fun draw(context: PdfContext, parent: Box2d) {
+    fun draw(context: PdfContext, parent: Box2d): List<PdfDrawnElement> {
         val drawableContent = getDrawableContent(parent)
         drawBackground(context, parent)
         if (context.properties.debugOn) {
@@ -51,7 +55,7 @@ abstract class PdfComponent(
             drawPadding(context, parent)
         }
         drawBorder(context, parent)
-        drawContent(context, drawableContent)
+        return drawContent(context, drawableContent)
     }
 
     private fun drawBackground(context: PdfContext, parent: Box2d) {
@@ -133,8 +137,11 @@ abstract class PdfComponent(
         TEXT,
         PARAGRAPH,
         PAGE_NB,
+        PAGE_BREAK,
         SHAPE
     }
+
+    abstract fun getChildren(): List<PdfComponent>
 
     abstract fun <T : PdfComponent> copyAbs(
         position: Position? = null,

@@ -1,6 +1,7 @@
 package com.andres_k.lib.builder
 
 import com.andres_k.lib.library.output.OutputBuilder
+import com.andres_k.lib.parser.PdfExplorer
 
 /**
  * Created on 2020/07/20.
@@ -8,5 +9,5 @@ import com.andres_k.lib.library.output.OutputBuilder
  * @author Kevin Andres
  */
 interface PdfBuilder {
-    fun build(output: OutputBuilder)
+    fun build(output: OutputBuilder): PdfExplorer
 }

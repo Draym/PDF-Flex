@@ -4,8 +4,9 @@ import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.DrawUtils
 import com.andres_k.lib.library.utils.FontCode
-import com.andres_k.lib.library.utils.PdfContext
-import com.andres_k.lib.library.utils.PdfOverdrawResult
+import com.andres_k.lib.library.utils.config.PdfContext
+import com.andres_k.lib.library.utils.data.PdfDrawnElement
+import com.andres_k.lib.library.utils.data.PdfOverdrawResult
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject
 import java.awt.Color
 
@@ -18,8 +19,9 @@ import java.awt.Color
 data class PdfImage private constructor(
     val image: PDImageXObject,
     override val size: Size,
-    val autoFill: Boolean,
+    val respectParent: Boolean,
     val respectRatio: Boolean,
+    override val identifier: String?,
     override val position: Position,
     override val bodyAlign: BodyAlign?,
     override val padding: Spacing,
@@ -27,26 +29,27 @@ data class PdfImage private constructor(
     override val color: Color?,
     override val background: Background,
     override val borders: Borders,
-    override val isBuilt: Boolean
-) : PdfComponent(position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.IMAGE) {
+    override val isBuilt: Boolean,
+) : PdfComponent(identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.IMAGE) {
 
     val aspectRation: Float = image.width.toFloat() / image.height.toFloat()
 
     constructor(
         image: PDImageXObject,
         size: ReqSize? = null,
-        autoFill: Boolean = true,
+        respectParent: Boolean = true,
         respectRatio: Boolean = true,
+        identifier: String? = null,
         position: Position = Position.ORIGIN,
         bodyAlign: BodyAlign? = null,
         margin: Spacing = Spacing.NONE,
         color: Color? = null,
         background: Background = Background.NONE,
-        borders: Borders = Borders.NONE
+        borders: Borders = Borders.NONE,
     ) : this(image, size
-        ?: Size(image.width.toFloat(), image.height.toFloat()), autoFill, respectRatio, position, bodyAlign, Spacing.NONE, margin, color, background, borders, false)
+        ?: Size(image.width.toFloat(), image.height.toFloat()), respectParent, respectRatio, identifier, position, bodyAlign, Spacing.NONE, margin, color, background, borders, false)
 
-    override fun drawContent(context: PdfContext, body: Box2d) {
+    override fun drawContent(context: PdfContext, body: Box2d): List<PdfDrawnElement> {
         DrawUtils.drawImage(
             stream = context.stream(),
             image = image,
@@ -55,6 +58,15 @@ data class PdfImage private constructor(
             width = body.width,
             height = body.height
         )
+        return listOf(PdfDrawnElement(
+            x = body.x,
+            y = body.y,
+            xAbs = body.x - padding.left,
+            yAbs = body.y - padding.top,
+            type = type,
+            identifier = identifier,
+            text = null
+        ))
     }
 
     override fun preRenderContent(context: PdfContext, body: Box2d): PdfOverdrawResult {
@@ -74,7 +86,7 @@ data class PdfImage private constructor(
     override fun calcMaxSize(context: PdfContext, parent: BoxSize): SizeResult {
         val imageResize = calcImageResize(parent)
         return imageResize.copy(
-            width = imageResize.width  + padding.spacingX() + margin.spacingX(),
+            width = imageResize.width + padding.spacingX() + margin.spacingX(),
             height = imageResize.height + padding.spacingY() + margin.spacingY()
         )
     }
@@ -83,13 +95,35 @@ data class PdfImage private constructor(
         val resizedWidth: Float
         val resizedHeight: Float
 
-        if (!autoFill) {
+        if (!respectParent) {
             return SizeResult(bodyWidth(), bodyHeight())
         }
 
-        if (!respectRatio && parent.width != null && parent.height != null) {
-            resizedWidth = parent.width
-            resizedHeight = parent.height
+        if (parent.width != null && parent.height != null) {
+            if (!respectRatio) {
+                resizedHeight = parent.height
+                resizedWidth = parent.width
+            } else {
+                var tempWidth: Float
+                var tempHeight: Float
+                if (parent.width > parent.height) {
+                    tempHeight = parent.height
+                    tempWidth = tempHeight * aspectRation
+                    if (tempWidth > parent.width) {
+                        tempWidth = parent.width
+                        tempHeight = tempWidth / aspectRation
+                    }
+                } else {
+                    tempWidth = parent.width
+                    tempHeight = tempWidth / aspectRation
+                    if (tempHeight > parent.height) {
+                        tempHeight = parent.height
+                        tempWidth = tempHeight * aspectRation
+                    }
+                }
+                resizedWidth = tempWidth
+                resizedHeight = tempHeight
+            }
         } else if (respectRatio && parent.height != null) {
             resizedHeight = parent.height
             resizedWidth = resizedHeight * aspectRation
@@ -103,6 +137,10 @@ data class PdfImage private constructor(
         return SizeResult(resizedWidth, resizedHeight)
     }
 
+    override fun getChildren(): List<PdfComponent> {
+        return emptyList()
+    }
+
     @Suppress("UNCHECKED_CAST")
     override fun <T : PdfComponent> copyAbs(
         position: Position?,
@@ -114,7 +152,7 @@ data class PdfImage private constructor(
         font: FontCode?,
         background: Background?,
         borders: Borders?,
-        isBuilt: Boolean
+        isBuilt: Boolean,
     ): T {
         return this.copy(
             position = position ?: this.position,

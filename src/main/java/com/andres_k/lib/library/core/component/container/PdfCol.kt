@@ -1,11 +1,10 @@
 package com.andres_k.lib.library.core.component.container
 
 import com.andres_k.lib.library.core.component.PdfComponent
-import com.andres_k.lib.library.core.component.element.PdfText
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.FontCode
-import com.andres_k.lib.library.utils.PdfContext
-import com.andres_k.lib.library.utils.PdfOverdrawResult
+import com.andres_k.lib.library.utils.config.PdfContext
+import com.andres_k.lib.library.utils.data.PdfOverdrawResult
 import java.awt.Color
 
 /**
@@ -15,48 +14,43 @@ import java.awt.Color
  */
 @Suppress("DataClassPrivateConstructor")
 data class PdfCol private constructor(
-    val content: PdfComponent,
-    override val size: Size,
+    override val elements: List<PdfComponent>,
+    override val identifier: String?,
     override val position: Position,
+    override val size: Size,
     override val padding: Spacing,
     override val color: Color?,
     override val background: Background,
     override val borders: Borders,
-    override val isBuilt: Boolean
-) : PdfComponent(position, size, null, padding, Spacing.NONE, color, background, borders, isBuilt, Type.COL) {
+    override val isBuilt: Boolean,
+) : PdfContainer(elements, false, identifier, position, size, null, padding, Spacing.NONE, color, background, borders, isBuilt, Type.COL) {
+
+    fun content(): PdfComponent? = if (elements.isNotEmpty()) elements[0] else null
 
     constructor(
         content: PdfComponent,
         maxWidth: SizeAttr? = null,
+        identifier: String? = null,
         padding: Spacing = Spacing.NONE,
         color: Color? = null,
         background: Background = Background.NONE,
-        borders: Borders = Borders.NONE
-    ) : this(content, Size(maxWidth, SizeAttr.percent(100f)), Position.ORIGIN, padding, color, background, borders, false)
+        borders: Borders = Borders.NONE,
+    ) : this(listOf(content), identifier, Position.ORIGIN, Size(maxWidth, SizeAttr.percent(100f)), padding, color, background, borders, false)
 
     // empty col
     constructor(
         color: Color? = null,
         background: Background = Background.NONE,
-        borders: Borders = Borders.NONE
-    ) : this(PdfText(""), Size(null, SizeAttr.percent(100f)), Position.ORIGIN, Spacing.NONE, color, background, borders, false)
-
-    init {
-        if (content is PdfCol) {
-            throw IllegalArgumentException("[PdfCol] PdfCol can only be contained by PdfRow")
-        }
-    }
-
-    override fun drawContent(context: PdfContext, body: Box2d) {
-        content.draw(context = context, parent = body)
-    }
+        borders: Borders = Borders.NONE,
+    ) : this(listOf(), null, Position.ORIGIN, Size(null, SizeAttr.percent(100f)), Spacing.NONE, color, background, borders, false)
 
     override fun preRenderContent(context: PdfContext, body: Box2d): PdfOverdrawResult {
-        val result = content.preRender(context = context, parent = body)
+        val result = content()?.preRender(context = context, parent = body)
 
         return PdfOverdrawResult(
-            main = if (result.main != null) this.copy(content = result.main, size = Size(size.width?.v, result.main.height())) else null,
-            overdraw = if (result.overdraw != null) this.copy(content = result.overdraw, size = Size(size.width?.v, result.overdraw.height())) else null)
+            main = if (result?.main != null) this.copy(elements = listOf(result.main), size = Size(size.width?.v, result.main.height())) else null,
+            overdraw = if (result?.overdraw != null) this.copy(elements = listOf(result.overdraw), size = Size(size.width?.v, result.overdraw.height())) else null
+        )
     }
 
     override fun buildContent(context: PdfContext, request: Box2dRequest, parent: BoxSize): PdfComponent {
@@ -68,15 +62,16 @@ data class PdfCol private constructor(
 
         //println("New col : $calcWidth ; $calcHeight ($parentWidth; $parentHeight) $containerWidth, $containerHeight")
 
-        var maxWidth = content.calcMaxSize(context = context, parent = BoxSize(containerWidth, containerHeight)).width
+        var maxWidth = content()?.calcMaxSize(context = context, parent = BoxSize(containerWidth, containerHeight))?.width
+            ?: 0f
 
-        val calcElement = content.build(context, Box2dRequest(), BoxSize(containerWidth
+        val calcElement = content()?.build(context, Box2dRequest(), BoxSize(containerWidth
             ?: maxWidth, containerHeight))
 
         maxWidth = calcWidth ?: maxWidth + padding.spacingX()
-        val maxHeight = calcHeight ?: calcElement.height() + padding.spacingY()
+        val maxHeight = calcHeight ?: (calcElement?.height() ?: 0f) + padding.spacingY()
 
-        return this.copy(content = calcElement, size = Size(maxWidth, maxHeight), position = calcPos, isBuilt = true)
+        return this.copy(elements = if (calcElement != null) listOf(calcElement) else emptyList(), size = Size(maxWidth, maxHeight), position = calcPos, isBuilt = true)
     }
 
     override fun calcMaxSize(context: PdfContext, parent: BoxSize): SizeResult {
@@ -85,7 +80,8 @@ data class PdfCol private constructor(
         val containerWidth: Float? = if (calcWidth != null) calcWidth - padding.spacingX() else null
         val containerHeight: Float? = if (calcHeight != null) calcHeight - padding.spacingY() else null
 
-        val contentSizes = content.calcMaxSize(context = context, parent = BoxSize(containerWidth, containerHeight))
+        val contentSizes = content()?.calcMaxSize(context = context, parent = BoxSize(containerWidth, containerHeight))
+            ?: SizeResult(0f, 0f)
 
         //println("** col return ${SizeAttr(contentSizes.width + padding.spacingX() + margin.spacingX(), contentSizes.height + padding.spacingY() + margin.spacingY())}")
         return SizeResult(calcWidth
@@ -103,7 +99,7 @@ data class PdfCol private constructor(
         font: FontCode?,
         background: Background?,
         borders: Borders?,
-        isBuilt: Boolean
+        isBuilt: Boolean,
     ): T {
         return this.copy(
             position = position ?: this.position,
