@@ -11,16 +11,23 @@ import com.andres_k.lib.library.utils.config.PdfContext
  *
  * @author Kevin Andres
  */
-class PdfTextLine(
-    items: List<PdfText>,
-    val forceInterLine: Boolean = true,
-    val interLine: Float? = null
+data class PdfTextLine private constructor(
+    val items: List<PdfText>,
+    val forceInterLine: Boolean,
+    val interLine: Float?,
 ) {
     /** Margin are not yet supported on independent PdfText within a PdfParagraph **/
-    val items = items.map { it.copy(margin = Spacing.NONE) }
+    constructor(
+        text: PdfText,
+        forceInterLine: Boolean = false,
+        interLine: Float? = null,
+    ) : this(listOf(text.copy(margin = Spacing.NONE)), forceInterLine, interLine)
 
-    constructor(text: PdfText): this(listOf(text))
-    constructor(text: String): this(PdfText(text))
+    constructor(
+        text: String,
+        forceInterLine: Boolean = false,
+        interLine: Float? = null,
+    ) : this(PdfText(text), forceInterLine, interLine)
 
 
     fun getTextWidth(context: PdfContext): Float {
@@ -82,14 +89,20 @@ class PdfTextLine(
     }
 
     companion object {
-        val EMPTY = PdfTextLine(emptyList())
+        val EMPTY = of(emptyList())
+
+        fun of(items: List<PdfText>,
+               forceInterLine: Boolean = false,
+               interLine: Float? = null): PdfTextLine {
+            return PdfTextLine(items.map { it.copy(margin = Spacing.NONE) }, forceInterLine, interLine)
+        }
     }
 }
 
 fun MutableList<PdfTextLine>.addText(index: Int, text: PdfText, interLine: Float? = null) {
-    this[index] = PdfTextLine(this[index].items + text, interLine = interLine)
+    this[index] = PdfTextLine.of(items = this[index].items + text, interLine = interLine)
 }
 
 fun MutableList<PdfTextLine>.addText(index: Int, text: PdfTextLine, interLine: Float? = null) {
-    this[index] = PdfTextLine(this[index].items + text.items, interLine = interLine)
+    this[index] = PdfTextLine.of(items = this[index].items + text.items, interLine = interLine)
 }

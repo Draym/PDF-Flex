@@ -194,7 +194,7 @@ abstract class PdfComponent(
                     (parentWidth * size.width!!.v / 100) - margin.spacingX()
                 }
             } else {
-                size.width!!.v - margin.spacingX()
+                size.width!!.v
             }
         }
     }
@@ -213,7 +213,7 @@ abstract class PdfComponent(
                     (parentHeight * size.height!!.v / 100) - margin.spacingY()
                 }
             } else {
-                size.height!!.v - margin.spacingY()
+                size.height!!.v
             }
         }
     }
