@@ -40,6 +40,20 @@ data class PdfRow private constructor(
         borders: Borders = Borders.NONE
     ) : this(elements, identifier, position, Size(width = SizeAttr.percent(100f), height = maxHeight), padding, margin, splitOnOverdraw, color, background, borders, false)
 
+    constructor(
+        element: PdfComponent,
+        identifier: String? = null,
+        position: Position = Position.ORIGIN,
+        maxHeight: SizeAttr? = null,
+        padding: Spacing = Spacing.NONE,
+        margin: Spacing = Spacing.NONE,
+        splitOnOverdraw: Boolean = true,
+        color: Color? = null,
+        background: Background = Background.NONE,
+        borders: Borders = Borders.NONE
+    ) : this(listOf(element), identifier, position, Size(width = SizeAttr.percent(100f), height = maxHeight), padding, margin, splitOnOverdraw, color, background, borders, false)
+
+
     override fun preRenderContent(context: PdfContext, body: Box2d): PdfOverdrawResult {
         val drawElements: MutableList<PdfComponent> = arrayListOf()
         val overdrawElements: MutableList<PdfComponent> = arrayListOf()

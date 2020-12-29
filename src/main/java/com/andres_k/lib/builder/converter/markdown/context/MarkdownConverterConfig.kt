@@ -3,6 +3,7 @@ package com.andres_k.lib.builder.converter.markdown.context
 import com.andres_k.lib.builder.converter.markdown.MarkdownConverter
 import com.andres_k.lib.builder.converter.markdown.action.IgnoreAction
 import com.andres_k.lib.builder.converter.markdown.action.MarkdownAction
+import com.andres_k.lib.library.core.property.Spacing
 import com.andres_k.lib.library.utils.EFont
 import com.andres_k.lib.library.utils.FontSize
 import org.intellij.markdown.IElementType
@@ -16,6 +17,8 @@ import java.util.*
 data class MarkdownConverterConfig(
     private val action: Map<IElementType, MarkdownAction>,
     private val font: Map<IElementType, Pair<EFont, FontSize>>,
+    private val margin: Map<IElementType, Spacing>,
+    private val padding: Map<IElementType, Spacing>,
     private val ignoreMissing: Boolean = false,
 ) {
 
@@ -42,10 +45,20 @@ data class MarkdownConverterConfig(
         return result
     }
 
+    fun margin(type: IElementType): Spacing {
+        return margin[type] ?: Spacing.NONE
+    }
+
+    fun padding(type: IElementType): Spacing {
+        return padding[type] ?: Spacing.NONE
+    }
+
     companion object {
         val DEFAULT = MarkdownConverterConfig(
             action = MarkdownConverter.Default.action,
-            font = MarkdownConverter.Default.font
+            font = MarkdownConverter.Default.font,
+            margin = MarkdownConverter.Default.margin,
+            padding = MarkdownConverter.Default.padding
         )
     }
 }

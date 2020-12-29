@@ -13,6 +13,8 @@ import org.intellij.markdown.ast.ASTNode
  *
  * @author Kevin Andres
  */
+
+/** MENU TITLE using ## **/
 object ConvertATXTitle : MarkdownAction {
 
     override fun run(
@@ -24,19 +26,23 @@ object ConvertATXTitle : MarkdownAction {
         context: MarkdownConverterContext,
     ): PdfParagraph {
         val font = markdown.font(node.type)
+        val margin = markdown.margin(node.type)
+        val padding = markdown.padding(node.type)
 
         val text = node.children.mapIndexedNotNull { childIndex, child ->
             if (child.type == MarkdownTokenTypes.ATX_CONTENT) {
                 val paragraph = ConvertParagraph.run(child, childIndex, node, config, markdown, context)
                 paragraph.lines.map { line ->
-                    PdfTextLine(line.items.map { text -> text.copy(font = font.first.code, fontSize = font.second) })
+                    PdfTextLine.of(line.items.map { text -> text.copy(font = font.first.code, fontSize = font.second) })
                 }
             } else null
         }.flatten()
 
         return PdfParagraph(
             lines = text,
-            interLine = config.defaultInterline
+            interLine = config.defaultInterline,
+            margin = margin,
+            padding = padding
         )
     }
 }

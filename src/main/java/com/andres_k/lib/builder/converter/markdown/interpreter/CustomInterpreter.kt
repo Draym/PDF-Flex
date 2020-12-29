@@ -7,7 +7,7 @@ import com.andres_k.lib.library.core.component.PdfComponent
  *
  * @author Kevin Andres
  */
-interface CustomInterpreter<T: PdfComponent> {
+interface CustomInterpreter<T : PdfComponent> {
     val interpreter: Map<String, CustomInterpreterAction<T>>
     val interpreterStart: String
     val interpreterEnd: String
@@ -15,7 +15,7 @@ interface CustomInterpreter<T: PdfComponent> {
     val parameterEnd: String
 
     fun isInterpreterValue(value: String): Boolean {
-        return value.startsWith(interpreterStart) && value.endsWith(interpreterEnd)
+        return value.trim().startsWith(interpreterStart) && value.trim().endsWith(interpreterEnd)
     }
 
     fun interpret(value: String): T?

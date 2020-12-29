@@ -4,7 +4,6 @@ import com.andres_k.lib.builder.converter.PdfConverterConfig
 import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterConfig
 import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterContext
 import com.andres_k.lib.library.core.component.element.PdfText
-import com.andres_k.lib.library.core.property.Spacing
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
 
@@ -13,6 +12,8 @@ import org.intellij.markdown.ast.ASTNode
  *
  * @author Kevin Andres
  */
+
+/** LINE BREAK (End Of Line) **/
 object ConvertEOL : MarkdownAction {
 
     override fun run(
@@ -25,10 +26,12 @@ object ConvertEOL : MarkdownAction {
     ): PdfText? {
         val previous = if (nodeIndex != 0) parent.children[nodeIndex - 1] else null
         return if (previous != null && previous.type == MarkdownTokenTypes.EOL) {
-            PdfText(
-                text = "",
-                margin = Spacing(top = config.defaultFontSize ?: 12f)
-            )
+            getEOL(markdown)
         } else null
+    }
+
+    fun getEOL(markdown: MarkdownConverterConfig): PdfText {
+        val margin = markdown.margin(MarkdownTokenTypes.EOL)
+        return PdfText(text = "", margin = margin)
     }
 }

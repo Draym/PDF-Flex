@@ -8,6 +8,7 @@ import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.component.container.PdfCol
 import com.andres_k.lib.library.core.component.container.PdfRow
 import com.andres_k.lib.library.core.property.SizeAttr
+import com.andres_k.lib.library.core.property.Spacing
 import com.andres_k.lib.library.utils.BaseFont
 import com.andres_k.lib.library.utils.EFont
 import com.andres_k.lib.library.utils.FontSize
@@ -71,6 +72,18 @@ object MarkdownConverter {
             MarkdownTokenTypes.EOL to ConvertEOL,
             MarkdownTokenTypes.WHITE_SPACE to IgnoreAction,
         )
+
+        /**
+         * Define default margin for specific ASTNode type
+         */
+        val margin: Map<IElementType, Spacing> = mapOf(
+            MarkdownElementTypes.LIST_ITEM to Spacing(bottom = 6f)
+        )
+
+        /**
+         * Define default padding for specific ASTNode type
+         */
+        val padding: Map<IElementType, Spacing> = mapOf()
     }
 
     /**

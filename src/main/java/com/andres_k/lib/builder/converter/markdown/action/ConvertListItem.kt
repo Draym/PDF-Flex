@@ -31,6 +31,8 @@ object ConvertListItem : MarkdownAction {
         markdown: MarkdownConverterConfig,
         context: MarkdownConverterContext,
     ): PdfRow {
+        val margin = markdown.margin(node.type)
+        val padding = markdown.padding(node.type)
 
         var listType = MarkdownTokenTypes.LIST_NUMBER
         var listItem = node.findChildOfType(MarkdownTokenTypes.LIST_NUMBER)
@@ -56,12 +58,13 @@ object ConvertListItem : MarkdownAction {
         )
 
         return PdfRow(
-            listOf(
+            elements = listOf(
                 PdfCol(
                     content = PdfText(
                         text = "$step ",
                         font = config.getDefaultFont(),
-                        fontSize = config.defaultFontSize)
+                        fontSize = config.defaultFontSize
+                    )
                 ),
                 PdfCol(
                     content = PdfView(
@@ -70,7 +73,9 @@ object ConvertListItem : MarkdownAction {
                     ),
                     maxWidth = SizeAttr.percent(97f)
                 )
-            )
+            ),
+            margin = margin,
+            padding = padding
         )
     }
 }

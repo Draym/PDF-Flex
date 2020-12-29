@@ -27,23 +27,35 @@ object ConvertParagraph : MarkdownAction {
         markdown: MarkdownConverterConfig,
         context: MarkdownConverterContext,
     ): PdfParagraph {
+        val margin = markdown.margin(node.type)
+        val padding = markdown.padding(node.type)
         val lines: MutableList<PdfTextLine> = mutableListOf(PdfTextLine.EMPTY)
         var index = 0
 
         node.children.forEachIndexed { childIndex, child ->
             when (child.type) {
                 MarkdownTokenTypes.TEXT -> {
-                    val text = ConvertText.extractText(child, config)
-                    lines.addText(index, text, text.margin.bottom)
+                    val text = ConvertText.extractText(child, markdown, config)
+                    lines.addText(
+                        index = index,
+                        text = text,
+                        interLine = if (text.margin.bottom != 0f) text.margin.bottom else null
+                    )
                 }
                 MarkdownTokenTypes.WHITE_SPACE -> {
-                    lines.addText(index, PdfText(" ", config.getDefaultFont(), config.defaultFontSize))
+                    lines.addText(
+                        index = index,
+                        text = PdfText(" ", config.getDefaultFont(), config.defaultFontSize)
+                    )
                 }
                 MarkdownElementTypes.EMPH -> {
                     val item = markdown.action(MarkdownElementTypes.EMPH).run(child, childIndex, node, config, markdown, context)
                     if (item != null) {
                         val text = (item as PdfText).text.lines()
-                        lines.addText(index, PdfText(text.first(), item.font, item.fontSize))
+                        lines.addText(
+                            index = index,
+                            text = PdfText(text.first(), item.font, item.fontSize)
+                        )
                         (text.subList(1, text.size)).forEach { lines.add(PdfTextLine(PdfText(it, item.font, item.fontSize))) }
                         index += text.size - 1
                     }
@@ -52,18 +64,21 @@ object ConvertParagraph : MarkdownAction {
                     val item = markdown.action(MarkdownElementTypes.STRONG).run(child, childIndex, node, config, markdown, context)
                     if (item != null) {
                         val text = (item as PdfText).text.lines()
-                        lines.addText(index, PdfText(text.first(), item.font, item.fontSize))
+                        lines.addText(
+                            index = index,
+                            text = PdfText(text.first(), item.font, item.fontSize)
+                        )
                         (text.subList(1, text.size)).forEach { lines.add(PdfTextLine(PdfText(it, item.font, item.fontSize))) }
                         index += text.size - 1
                     }
                 }
                 MarkdownTokenTypes.EOL -> {
-                    lines.add(PdfTextLine.EMPTY)
+                    lines.add(PdfTextLine(ConvertEOL.getEOL(markdown)))
                     index++
                 }
                 MarkdownTokenTypes.HTML_TAG -> {
                     if (child.getTextInNode(config.data).toString() == HTMLSupport.LINE_BREAK.code) {
-                        lines.add(PdfTextLine.EMPTY)
+                        lines.add(PdfTextLine(ConvertEOL.getEOL(markdown)))
                         index++
                     }
                 }
@@ -72,7 +87,9 @@ object ConvertParagraph : MarkdownAction {
 
         return PdfParagraph(
             lines = lines,
-            interLine = config.defaultInterline
+            interLine = config.defaultInterline,
+            margin = margin,
+            padding = padding
         )
     }
 }

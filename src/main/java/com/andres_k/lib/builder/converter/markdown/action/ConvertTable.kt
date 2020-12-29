@@ -4,6 +4,8 @@ import com.andres_k.lib.builder.converter.PdfConverterConfig
 import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterConfig
 import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterContext
 import com.andres_k.lib.library.core.component.container.PdfCol
+import com.andres_k.lib.library.core.component.custom.PdfTextLine
+import com.andres_k.lib.library.core.component.element.PdfParagraph
 import com.andres_k.lib.library.core.component.element.PdfTable
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.findChildOfType
@@ -17,27 +19,29 @@ import org.intellij.markdown.flavours.gfm.GFMTokenTypes
  */
 object ConvertTable : MarkdownAction {
 
-    private fun getCols(row: ASTNode, config: PdfConverterConfig): List<PdfCol> {
+    private fun getCols(row: ASTNode, markdown: MarkdownConverterConfig, config: PdfConverterConfig): List<PdfCol> {
+        val padding = markdown.padding(GFMTokenTypes.CELL)
+
         return row.children.mapIndexedNotNull { index, child ->
             if (child.type == GFMTokenTypes.CELL) {
-                val text = ConvertText.extractText(child, config)
-                PdfCol(content = text)
+                val text = PdfParagraph(listOf(PdfTextLine(ConvertText.extractText(child, markdown, config))))
+                PdfCol(content = text, padding = padding)
             } else null
         }
     }
 
-    private fun getHeader(table: ASTNode, config: PdfConverterConfig): List<PdfCol> {
+    private fun getHeader(table: ASTNode, markdown: MarkdownConverterConfig, config: PdfConverterConfig): List<PdfCol> {
         val header = table.findChildOfType(GFMElementTypes.HEADER)
 
         return if (header != null) {
-            getCols(header, config)
+            getCols(header, markdown, config)
         } else emptyList()
     }
 
-    private fun getRows(table: ASTNode, config: PdfConverterConfig): List<List<PdfCol>> {
+    private fun getRows(table: ASTNode, markdown: MarkdownConverterConfig, config: PdfConverterConfig): List<List<PdfCol>> {
         return table.children.mapNotNull { child ->
             if (child.type == GFMElementTypes.ROW) {
-                getCols(child, config)
+                getCols(child, markdown, config)
             } else null
         }
     }
@@ -50,12 +54,16 @@ object ConvertTable : MarkdownAction {
         markdown: MarkdownConverterConfig,
         context: MarkdownConverterContext,
     ): PdfTable {
-        val header = getHeader(node, config)
-        val rows = getRows(node, config)
+        val margin = markdown.margin(node.type)
+        val padding = markdown.padding(node.type)
+        val header = getHeader(node, markdown, config)
+        val rows = getRows(node, markdown, config)
 
         return PdfTable(
             header = header,
-            rows = rows
+            rows = rows,
+            margin = margin,
+            padding = padding
         )
     }
 }

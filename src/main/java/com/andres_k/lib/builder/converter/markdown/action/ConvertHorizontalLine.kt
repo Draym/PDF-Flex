@@ -5,7 +5,6 @@ import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterConf
 import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterContext
 import com.andres_k.lib.library.core.component.container.PdfRow
 import com.andres_k.lib.library.core.property.Borders
-import com.andres_k.lib.library.core.property.Spacing
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
 
@@ -24,13 +23,16 @@ object ConvertHorizontalLine : MarkdownAction {
         markdown: MarkdownConverterConfig,
         context: MarkdownConverterContext,
     ): PdfRow? {
+        val margin = markdown.margin(node.type)
+        val padding = markdown.padding(node.type)
+
         val previous = if (nodeIndex != 0) parent.children[nodeIndex - 1] else null
         return if (previous != null && previous.type == MarkdownTokenTypes.EOL) {
             PdfRow(
                 elements = emptyList(),
                 borders = Borders.BOTTOM(),
-                padding = Spacing(top = config.defaultFontSize ?: 12f),
-                margin = Spacing(bottom = config.defaultFontSize ?: 12f)
+                padding = padding.merge(top = config.defaultFontSize ?: 12f),
+                margin = margin.merge(bottom = config.defaultFontSize ?: 12f)
             )
         } else null
     }

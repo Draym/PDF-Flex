@@ -6,7 +6,6 @@ import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterConf
 import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterContext
 import com.andres_k.lib.library.core.component.container.PdfView
 import com.andres_k.lib.library.core.property.Size
-import com.andres_k.lib.library.core.property.Spacing
 import org.intellij.markdown.ast.ASTNode
 
 /**
@@ -23,10 +22,14 @@ object ConvertList : MarkdownAction {
         markdown: MarkdownConverterConfig,
         context: MarkdownConverterContext,
     ): PdfView {
+        val margin = markdown.margin(node.type)
+        val padding = markdown.padding(node.type)
+
         val rows = MarkdownConverter.analyseNodeChildren(node, config, markdown, context)
         return PdfView(
             elements = rows,
-            margin = Spacing(left = config.defaultPadding),
+            margin = margin,
+            padding = padding.merge(left = config.defaultPadding),
             size = Size.FULL
         )
     }

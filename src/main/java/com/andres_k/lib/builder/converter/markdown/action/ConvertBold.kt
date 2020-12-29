@@ -23,6 +23,8 @@ object ConvertBold : MarkdownAction {
         markdown: MarkdownConverterConfig,
         context: MarkdownConverterContext,
     ): PdfText {
+        val margin = markdown.margin(node.type)
+
         val fontBold = config.getDefaultBoldFont()
         var text = ""
         node.children.forEach { child ->
@@ -33,6 +35,11 @@ object ConvertBold : MarkdownAction {
                 text += child.getTextInNode(config.data)
             }
         }
-        return PdfText(text, fontBold, config.defaultFontSize)
+        return PdfText(
+            text = text,
+            font = fontBold,
+            fontSize = config.defaultFontSize,
+            margin = margin
+        )
     }
 }

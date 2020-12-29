@@ -7,7 +7,7 @@ import com.andres_k.lib.library.core.component.PdfComponent
  *
  * @author Kevin Andres
  */
-interface CustomInterpreterAction<T: PdfComponent> {
+interface CustomInterpreterAction<T : PdfComponent> {
 
     fun run(parameters: Map<String, String>): T
 }
