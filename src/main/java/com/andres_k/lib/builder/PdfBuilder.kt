@@ -8,6 +8,6 @@ import com.andres_k.lib.parser.PdfExplorer
  *
  * @author Kevin Andres
  */
-interface PdfBuilder {
+interface PdfBuilder: AutoCloseable {
     fun build(output: OutputBuilder): PdfExplorer
 }

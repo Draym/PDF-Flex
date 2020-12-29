@@ -22,4 +22,8 @@ class PdfToByteStream : OutputBuilder {
     fun get(): ByteArrayInputStream {
         return ByteArrayInputStream(output.toByteArray())
     }
+
+    override fun close() {
+        output.close()
+    }
 }

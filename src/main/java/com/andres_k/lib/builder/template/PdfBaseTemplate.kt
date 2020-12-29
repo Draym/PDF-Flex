@@ -61,10 +61,15 @@ abstract class PdfBaseTemplate(
             key.code to PdfFontLoader.loadTTCFont(document.document, font)
         }.toMap()
     }
+
     protected abstract fun getFontToLoad(): Map<EFont, TrueTypeFont>
 
     protected abstract fun createHeader(): PdfHeader?
     protected abstract fun createFooter(): PdfFooter?
     protected abstract fun createPages(): List<PdfPage>
     protected abstract fun getPdfDefaultProperties(): PdfProperties
+
+    override fun close() {
+        document.close()
+    }
 }

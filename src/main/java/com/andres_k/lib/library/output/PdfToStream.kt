@@ -16,4 +16,7 @@ class PdfToStream(private val output: OutputStream) : OutputBuilder {
         document.save(output)
     }
 
+    override fun close() {
+        output.close()
+    }
 }

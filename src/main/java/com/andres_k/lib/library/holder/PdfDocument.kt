@@ -19,7 +19,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream
  */
 class PdfDocument(
     metadata: PdfMetadata = PdfMetadata.NONE,
-) {
+) : AutoCloseable {
     val document: PDDocument = PDDocument()
 
     init {
@@ -124,7 +124,10 @@ class PdfDocument(
             debug = debug
         )
         builder.save(document)
-        document.document.close()
         return PdfExplorer(drawnPages)
+    }
+
+    override fun close() {
+        document.close()
     }
 }

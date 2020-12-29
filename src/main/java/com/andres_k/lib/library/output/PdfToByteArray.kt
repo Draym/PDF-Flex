@@ -21,4 +21,8 @@ class PdfToByteArray : OutputBuilder {
     fun get(): ByteArray {
         return output.toByteArray()
     }
+
+    override fun close() {
+        output.close()
+    }
 }

@@ -9,28 +9,28 @@ import java.io.File
  *
  * @author Kevin Andres
  */
-interface OutputBuilder {
+interface OutputBuilder: AutoCloseable {
     fun validateOutput()
     fun save(document: PDDocument)
 
     companion object {
-        fun toFile(fileName: String): PdfToFile {
+        fun asFile(fileName: String): PdfToFile {
             return PdfToFile(output = File(fileName))
         }
 
-        fun toFile(file: File): PdfToFile {
+        fun asFile(file: File): PdfToFile {
             return PdfToFile(output = file)
         }
 
-        fun toStream(output: ByteArrayOutputStream): PdfToStream {
+        fun asStream(output: ByteArrayOutputStream): PdfToStream {
             return PdfToStream(output = output)
         }
 
-        fun toByteStream(): PdfToByteStream {
+        fun asByteStream(): PdfToByteStream {
             return PdfToByteStream()
         }
 
-        fun toByteArray(): PdfToByteArray {
+        fun asByteArray(): PdfToByteArray {
             return PdfToByteArray()
         }
     }

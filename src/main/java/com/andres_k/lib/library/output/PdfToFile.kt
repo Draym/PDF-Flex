@@ -18,4 +18,7 @@ class PdfToFile(private val output: File): OutputBuilder {
     override fun save(document: PDDocument) {
         document.save(output)
     }
+
+    override fun close() {
+    }
 }
