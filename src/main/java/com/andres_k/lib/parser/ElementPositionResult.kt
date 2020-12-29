@@ -23,32 +23,32 @@ data class ElementPositionResult(
      * Text position where origin(0,0) is upper left
      * @return position expressed in pdf unit
      */
-    fun getPositionFromTop(): Pair<Float, Float> {
-        return x to y
+    fun getPositionFromTop(): Pos {
+        return Pos(x, y)
     }
 
     /**
      * Text position where origin(0,0) is bottom left
      * @return position expressed in pdf unit
      */
-    fun getPositionFromBottom(): Pair<Float, Float> {
-        return x to (pageHeight - y)
+    fun getPositionFromBottom(): Pos {
+        return Pos(x, pageHeight - y)
     }
 
     /**
      * Text position where origin(0,0) is upper left
      * @return position expressed in mm
      */
-    fun getPositionFromTopAsMM(): Pair<Float, Float> {
-        return x * MM_PER_POINT to y * MM_PER_POINT
+    fun getPositionFromTopAsMM(): Pos {
+        return Pos(x * MM_PER_POINT, y * MM_PER_POINT)
     }
 
     /**
      * Text position where origin(0,0) is bottom left
      * @return position expressed in mm
      */
-    fun getPositionFromBottomAsMM(): Pair<Float, Float> {
-        return x * MM_PER_POINT to (pageHeight - y) * MM_PER_POINT
+    fun getPositionFromBottomAsMM(): Pos {
+        return Pos(x * MM_PER_POINT, (pageHeight - y) * MM_PER_POINT)
     }
 
     companion object {
@@ -57,6 +57,8 @@ data class ElementPositionResult(
         private const val POINTS_PER_CM = POINTS_PER_INCH / 2.54f
 
         /** Taken from PDF-Box - user space units per millimeter  */
-        private const val MM_PER_POINT =  1 / (POINTS_PER_CM / 10)
+        private const val MM_PER_POINT = 1 / (POINTS_PER_CM / 10)
     }
+
+    data class Pos(val x: Float, val y: Float)
 }

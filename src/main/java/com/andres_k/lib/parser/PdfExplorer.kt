@@ -11,9 +11,13 @@ import com.andres_k.lib.library.utils.data.PdfDrawnPage
 data class PdfExplorer(private val drawnPages: List<PdfDrawnPage>) {
 
     fun searchText(value: String, absPosition: Boolean = false): List<ElementPositionResult> {
+        return searchText(Regex.fromLiteral(value), absPosition)
+    }
+
+    fun searchText(regex: Regex, absPosition: Boolean = false): List<ElementPositionResult> {
         return drawnPages.mapIndexed { pageIndex, page ->
             page.drawnElements.mapNotNull { component ->
-                if (component.text != null && component.text.contains(value)) {
+                if (component.text != null && component.text.contains(regex)) {
                     ElementPositionResult(
                         page = pageIndex,
                         line = -1, // unknown
