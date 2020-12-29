@@ -47,13 +47,11 @@ data class PdfView private constructor(
         var drawHeight = 0f
 
         /** Try render elements **/
-        var hasOverdraw = false
+        var hasJumpPage = false
         elements.forEach {
-            if (hasOverdraw || it.type == Type.PAGE_BREAK) {
-                if (hasOverdraw) {
-                    overdrawElements.add(it)
-                }
-                hasOverdraw = true
+            if (hasJumpPage || it.type == Type.PAGE_BREAK) {
+                overdrawElements.add(it)
+                hasJumpPage = true
             } else {
                 val result = it.preRender(context = context, parent = body)
                 if (result.main != null) {
@@ -72,7 +70,10 @@ data class PdfView private constructor(
         var cursorY = 0f
         var previousX = 0f
         var maxLineHeight = 0f
-        val calcOverdrawElements = overdrawElements.map { element ->
+        val calcOverdrawElements = overdrawElements.mapIndexedNotNull { index, element ->
+            if (index == 0 && element.type == Type.PAGE_BREAK) {
+                return@mapIndexedNotNull null
+            }
             val result: PdfComponent = element.copyAbs(Position(element.position.x, cursorY), isBuilt = true)
 
             if (result.height().bigger(maxLineHeight)) {

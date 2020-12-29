@@ -33,6 +33,7 @@ data class PdfContextDebug(
             background = mapOf(
                 Type.COL to Color.CYAN.withAlpha(0.05f),
                 Type.TEXT to Color.LIGHT_GRAY.withAlpha(0.3f),
+                Type.PAGE_NB to Color.ORANGE.withAlpha(0.3f),
                 Type.PAGE_BREAK to Color.GREEN.withAlpha(0.3f)
             )
         )
