@@ -116,7 +116,7 @@ data class PdfParagraph private constructor(
         val calcElements: MutableList<PdfTextLine> = arrayListOf()
         var cursorY = 0f
         finalLines.forEachIndexed { index, line ->
-            val hasInterline = getInterLine(line, index == finalLines.size - 1, context.properties)
+            val interline = getInterLine(line, index == finalLines.size - 1, context.properties)
             var cursorX = 0f
 
             val items = line.items.map {
@@ -124,9 +124,9 @@ data class PdfParagraph private constructor(
                 cursorX += item.width()
                 item
             }
-            val newLine = PdfTextLine(items)
+            val newLine = PdfTextLine.of(items)
             calcElements.add(newLine)
-            cursorY += newLine.height() + hasInterline
+            cursorY += newLine.height() + interline
         }
         val maxHeight = calcHeight ?: cursorY + padding.spacingY()
         return this.copy(lines = calcElements, position = calcPos, size = Size(calcWidth, maxHeight), isBuilt = true)
@@ -142,7 +142,7 @@ data class PdfParagraph private constructor(
                 val newLines = splitWordInLines(line, containerWidth, context)
 
                 newLines.forEachIndexed { newIndex, newLine ->
-                    maxHeight += newLine.getTextHeight(context) + getInterLine(line, index == lines.size - 1 && newIndex == newLines.size - 1, context.properties)
+                    maxHeight += newLine.getTextHeight(context) + getInterLine(newLine, index == lines.size - 1 && newIndex == newLines.size - 1, context.properties)
                 }
             } else {
                 maxHeight += line.getTextHeight(context) + getInterLine(line, index == lines.size - 1, context.properties)
@@ -228,6 +228,9 @@ data class PdfParagraph private constructor(
                 }
             }
         }
+        if (newLines.isNotEmpty()) {
+            newLines[newLines.size - 1] = newLines[newLines.size - 1].copy(interLine = line.interLine)
+        }
         return newLines
     }
 
@@ -248,13 +251,12 @@ data class PdfParagraph private constructor(
             var cursorY = 0f
 
             val calcOverdrawElements = overdrawText.mapIndexed { index, line ->
-                val hasInterline = getInterLine(line, index == overdrawText.size - 1, context.properties)
-
+                val interline = getInterLine(line, index == overdrawText.size - 1, context.properties)
                 val result = line.items.map { text ->
                     text.copyAbs(Position(text.position.x, cursorY), isBuilt = true) as PdfText
                 }
-                cursorY += line.height() + hasInterline
-                PdfTextLine(result)
+                cursorY += line.height() + interline
+                PdfTextLine.of(result)
             }
             val mainParagraph = if (overdrawIndex != 0) {
                 this.copy(lines = lines.subList(0, overdrawIndex), size = Size(size.width?.v, contentHeight() - cursorY))
@@ -272,6 +274,7 @@ data class PdfParagraph private constructor(
         val drawLines = lines.map { line ->
             line.items.map { it.draw(context = context, parent = body) }.flatten()
         }.flatten()
+
         return listOf(PdfDrawnElement(
             x = body.x,
             y = body.y,
@@ -284,9 +287,11 @@ data class PdfParagraph private constructor(
     }
 
     private fun getInterLine(line: PdfTextLine, isLastLine: Boolean, properties: PdfProperties): Float {
+        val interline = line.interLine ?: interLine ?: properties.defaultInterline
+
         return if (isLastLine) {
-            if (line.forceInterLine) line.interLine ?: 0f else 0f
-        } else line.interLine ?: interLine ?: properties.defaultInterline
+            if (line.forceInterLine) interline else 0f
+        } else interline
     }
 
     override fun getChildren(): List<PdfComponent> {

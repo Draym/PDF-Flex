@@ -17,7 +17,7 @@ data class PdfConverterConfig(
     private val defaultFont: FontCode,
     private val defaultFontBold: FontCode? = null,
     private val defaultFontItalic: FontCode? = null,
-    val defaultInterline: Float = 6f,
+    val defaultInterline: Float? = 6f,
     val defaultFontSize: Float? = null,
     val defaultPadding: Float = 20f,
     val defaultUnorderedList: SymbolPicker = BulletPicker(),
