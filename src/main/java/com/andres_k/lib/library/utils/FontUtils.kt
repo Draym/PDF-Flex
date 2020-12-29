@@ -21,12 +21,9 @@ object FontUtils {
         fontPath: String,
         fontName: String,
     ): TrueTypeFont {
-        val stream = FontUtils::class.java.getResourceAsStream(fontPath)
-            ?: throw Exception("File [$fontPath] not found")
-
-        val trueTypeCollection = TrueTypeCollection(stream)
-
-        return trueTypeCollection.getFontByName(fontName)
+        FontUtils::class.java.getResourceAsStream(fontPath).use {
+            return TrueTypeCollection(it).getFontByName(fontName)
+        }
     }
 
     fun getTextWidth(
