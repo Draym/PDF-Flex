@@ -136,6 +136,7 @@ abstract class PdfComponent(
         TABLE,
         TEXT,
         PARAGRAPH,
+        PAGE,
         PAGE_NB,
         PAGE_BREAK,
         SHAPE
@@ -158,29 +159,29 @@ abstract class PdfComponent(
 
     /** CALCULATION **/
 
-    protected fun calcX(request: Box2dRequest, parentWidth: Float?): Float {
+    protected fun calcX(request: Box2dRequest, parent: BoxSize): Float {
         return if (position.property == PosProperty.RELATIVE) {
             if (request.x != null) {
                 println("--{WARNING}--[Position] requestedX ignored")
             }
-            if (parentWidth == null) {
-                throw IllegalArgumentException("[Position] child can't have relative x (%) if parent doesn't have a known width")
-            } else parentWidth * position.x / 100
+            if (parent.width == null) {
+                throw IllegalArgumentException("[Position] child($type) can't have relative x (%) if parent(${parent.type} doesn't have a known width")
+            } else parent.width * position.x / 100
         } else position.x + (request.x ?: 0f)
     }
 
-    protected fun calcY(request: Box2dRequest, parentHeight: Float?): Float {
+    protected fun calcY(request: Box2dRequest, parent: BoxSize): Float {
         return if (position.property == PosProperty.RELATIVE) {
             if (request.y != null) {
                 println("--{WARNING}--[Position] requestedY ignored")
             }
-            if (parentHeight == null) {
-                throw IllegalArgumentException("[Position] child can't have relative y (%) if parent doesn't have a known height")
-            } else parentHeight * position.y / 100
+            if (parent.height == null) {
+                throw IllegalArgumentException("[Position] child($type) can't have relative y (%) if parent(${parent.type}) doesn't have a known height")
+            } else parent.height * position.y / 100
         } else position.y + (request.y ?: 0f)
     }
 
-    protected fun calcWidth(request: Box2dRequest? = null, parentWidth: Float?, ignore: Boolean = false): Float? {
+    protected fun calcWidth(request: Box2dRequest? = null, parent: BoxSize, ignore: Boolean = false): Float? {
         if (request?.width != null) {
             return request.width
         }
@@ -188,10 +189,10 @@ abstract class PdfComponent(
             null
         } else {
             if (size.width!!.isPercentage) {
-                if (parentWidth == null) {
-                    if (ignore) return null else throw IllegalArgumentException("[SizeParameter] child can't have relative width (%) if parent doesn't have a known width")
+                if (parent.width == null) {
+                    if (ignore) return null else throw IllegalArgumentException("[SizeParameter] child($type) can't have relative width (%) if parent(${parent.type}) doesn't have a known width")
                 } else {
-                    (parentWidth * size.width!!.v / 100) - margin.spacingX()
+                    (parent.width * size.width!!.v / 100) - margin.spacingX()
                 }
             } else {
                 size.width!!.v
@@ -199,7 +200,7 @@ abstract class PdfComponent(
         }
     }
 
-    protected fun calcHeight(request: Box2dRequest? = null, parentHeight: Float?, ignore: Boolean = false): Float? {
+    protected fun calcHeight(request: Box2dRequest? = null, parent: BoxSize, ignore: Boolean = false): Float? {
         if (request?.height != null) {
             return request.height
         }
@@ -207,10 +208,10 @@ abstract class PdfComponent(
             null
         } else {
             if (size.height!!.isPercentage) {
-                if (parentHeight == null) {
-                    if (ignore) return null else throw IllegalArgumentException("[SizeParameter] child can't have relative height (%) if parent doesn't have a known height")
+                if (parent.height == null) {
+                    if (ignore) return null else throw IllegalArgumentException("[SizeParameter] child($type) can't have relative height (%) if parent(${parent.type}) doesn't have a known height")
                 } else {
-                    (parentHeight * size.height!!.v / 100) - margin.spacingY()
+                    (parent.height * size.height!!.v / 100) - margin.spacingY()
                 }
             } else {
                 size.height!!.v
