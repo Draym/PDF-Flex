@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.andres_k.lib</groupId>
     <artifactId>pdf-flex</artifactId>
-    <version>1.0.002</version>
+    <version>1.0.003</version>
     <name>pdf-flex</name>
     <description>PDF Builder for Kotlin</description>
 
