@@ -24,6 +24,7 @@ object ConvertBold : MarkdownAction {
         context: MarkdownConverterContext,
     ): PdfText {
         val margin = markdown.margin(node.type)
+        val align = markdown.align(node.type)
 
         val fontBold = config.getDefaultBoldFont()
         var text = ""
@@ -39,7 +40,8 @@ object ConvertBold : MarkdownAction {
             text = text,
             font = fontBold,
             fontSize = config.defaultFontSize,
-            margin = margin
+            margin = margin,
+            bodyAlign = align
         )
     }
 }

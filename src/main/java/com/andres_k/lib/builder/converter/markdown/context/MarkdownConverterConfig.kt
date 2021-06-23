@@ -3,6 +3,7 @@ package com.andres_k.lib.builder.converter.markdown.context
 import com.andres_k.lib.builder.converter.markdown.MarkdownConverter
 import com.andres_k.lib.builder.converter.markdown.action.IgnoreAction
 import com.andres_k.lib.builder.converter.markdown.action.MarkdownAction
+import com.andres_k.lib.library.core.property.BodyAlign
 import com.andres_k.lib.library.core.property.Spacing
 import com.andres_k.lib.library.utils.EFont
 import com.andres_k.lib.library.utils.FontSize
@@ -19,6 +20,7 @@ data class MarkdownConverterConfig(
     private val font: Map<IElementType, Pair<EFont, FontSize>>,
     private val margin: Map<IElementType, Spacing>,
     private val padding: Map<IElementType, Spacing>,
+    private val align: Map<IElementType, BodyAlign>,
     private val ignoreMissing: Boolean = false,
 ) {
 
@@ -53,12 +55,17 @@ data class MarkdownConverterConfig(
         return padding[type] ?: Spacing.NONE
     }
 
+    fun align(type: IElementType): BodyAlign? {
+        return align[type]
+    }
+
     companion object {
         val DEFAULT = MarkdownConverterConfig(
             action = MarkdownConverter.Default.action,
             font = MarkdownConverter.Default.font,
             margin = MarkdownConverter.Default.margin,
-            padding = MarkdownConverter.Default.padding
+            padding = MarkdownConverter.Default.padding,
+            align = MarkdownConverter.Default.align
         )
     }
 }

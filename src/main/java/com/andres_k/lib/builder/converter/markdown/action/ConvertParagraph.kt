@@ -29,6 +29,7 @@ object ConvertParagraph : MarkdownAction {
     ): PdfParagraph {
         val margin = markdown.margin(node.type)
         val padding = markdown.padding(node.type)
+        val align = markdown.align(node.type)
         val lines: MutableList<PdfTextLine> = mutableListOf(PdfTextLine.EMPTY)
         var index = 0
 
@@ -82,6 +83,14 @@ object ConvertParagraph : MarkdownAction {
                         index++
                     }
                 }
+                else -> {
+                    val text = ConvertText.extractText(child, markdown, config)
+                    lines.addText(
+                        index = index,
+                        text = text,
+                        interLine = if (text.margin.bottom != 0f) text.margin.bottom else null
+                    )
+                }
             }
         }
 
@@ -89,7 +98,8 @@ object ConvertParagraph : MarkdownAction {
             lines = lines,
             interLine = config.defaultInterline,
             margin = margin,
-            padding = padding
+            padding = padding,
+            bodyAlign = align
         )
     }
 }

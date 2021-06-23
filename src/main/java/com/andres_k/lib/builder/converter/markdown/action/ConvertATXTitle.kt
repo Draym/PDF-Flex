@@ -28,12 +28,13 @@ object ConvertATXTitle : MarkdownAction {
         val font = markdown.font(node.type)
         val margin = markdown.margin(node.type)
         val padding = markdown.padding(node.type)
+        val align = markdown.align(node.type)
 
         val text = node.children.mapIndexedNotNull { childIndex, child ->
             if (child.type == MarkdownTokenTypes.ATX_CONTENT) {
                 val paragraph = ConvertParagraph.run(child, childIndex, node, config, markdown, context)
                 paragraph.lines.map { line ->
-                    PdfTextLine.of(line.items.map { text -> text.copy(font = font.first.code, fontSize = font.second) })
+                    PdfTextLine.of(line.items.map { text -> text.copy(font = font.first.code, fontSize = font.second, bodyAlign = align) })
                 }
             } else null
         }.flatten()

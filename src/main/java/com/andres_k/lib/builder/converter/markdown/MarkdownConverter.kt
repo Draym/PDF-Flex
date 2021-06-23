@@ -7,6 +7,7 @@ import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterCont
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.component.container.PdfCol
 import com.andres_k.lib.library.core.component.container.PdfRow
+import com.andres_k.lib.library.core.property.BodyAlign
 import com.andres_k.lib.library.core.property.SizeAttr
 import com.andres_k.lib.library.core.property.Spacing
 import com.andres_k.lib.library.utils.BaseFont
@@ -16,6 +17,7 @@ import org.intellij.markdown.IElementType
 import org.intellij.markdown.MarkdownElementTypes
 import org.intellij.markdown.MarkdownTokenTypes
 import org.intellij.markdown.ast.ASTNode
+import org.intellij.markdown.ast.getTextInNode
 import org.intellij.markdown.flavours.MarkdownFlavourDescriptor
 import org.intellij.markdown.flavours.gfm.GFMElementTypes
 import org.intellij.markdown.flavours.gfm.GFMFlavourDescriptor
@@ -67,6 +69,8 @@ object MarkdownConverter {
             MarkdownElementTypes.ATX_4 to ConvertATXTitle,
             MarkdownElementTypes.ATX_5 to ConvertATXTitle,
             MarkdownElementTypes.ATX_6 to ConvertATXTitle,
+            MarkdownElementTypes.INLINE_LINK to ConvertLink,
+            MarkdownElementTypes.SHORT_REFERENCE_LINK to ConvertShortLink,
             MarkdownTokenTypes.HTML_TAG to ConvertHtmlTag,
             MarkdownElementTypes.HTML_BLOCK to ConvertHtmlBlock,
             MarkdownTokenTypes.EOL to ConvertEOL,
@@ -84,6 +88,11 @@ object MarkdownConverter {
          * Define default padding for specific ASTNode type
          */
         val padding: Map<IElementType, Spacing> = mapOf()
+
+        /**
+         * Define default position for specific ASTNode type
+         */
+        val align: Map<IElementType, BodyAlign> = mapOf()
     }
 
     /**
@@ -153,11 +162,37 @@ object MarkdownConverter {
         markdown: MarkdownConverterConfig = MarkdownConverterConfig.DEFAULT,
     ): List<PdfComponent> {
         val node = buildNodeTree(text, descriptor)
+
+        println(stringifyNode(text, node))
+
         return analyseNodeChildren(
             node = node,
             config = config,
             markdown = markdown,
             context = MarkdownConverterContext.NEW
         )
+    }
+
+    /**
+     * Utility function to stringify a Node
+     * helpful for logs
+     */
+    fun stringifyNode(text: String, node: ASTNode, level: Int = 0): String {
+        val builder = StringBuilder()
+
+        builder.append("|")
+        for (i in 0 until level) { builder.append("_") }
+        builder.append("Node[${node.type}]: ${node.getTextInNode(text)}")
+        if (node.children.isNotEmpty()) {
+            builder.appendLine()
+            builder.append("|")
+            for (i in 0 until level) { builder.append("_") }
+            builder.append("children:")
+        }
+        node.children.forEach { child ->
+            builder.appendLine()
+            builder.append(stringifyNode(text, child, level + 2))
+        }
+        return builder.toString()
     }
 }

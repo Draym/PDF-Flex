@@ -28,6 +28,7 @@ object ConvertText : MarkdownAction {
 
     fun extractText(node: ASTNode, markdown: MarkdownConverterConfig, config: PdfConverterConfig): PdfText {
         val margin = markdown.margin(node.type)
+        val align = markdown.align(node.type)
         val text = node.getTextInNode(config.data).toString()
         val customInterpreter = config.customInterpreter[PdfComponent.Type.TEXT]
 
@@ -42,7 +43,8 @@ object ConvertText : MarkdownAction {
             text = text,
             font = config.getDefaultFont(),
             fontSize = config.defaultFontSize,
-            margin = margin
+            margin = margin,
+            bodyAlign = align
         )
     }
 }

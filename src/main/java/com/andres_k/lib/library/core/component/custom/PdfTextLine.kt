@@ -1,6 +1,7 @@
 package com.andres_k.lib.library.core.component.custom
 
 import com.andres_k.lib.library.core.component.element.PdfText
+import com.andres_k.lib.library.core.property.BodyAlign
 import com.andres_k.lib.library.core.property.Box2d
 import com.andres_k.lib.library.core.property.Spacing
 import com.andres_k.lib.library.utils.bigger
@@ -20,14 +21,15 @@ data class PdfTextLine private constructor(
     constructor(
         text: PdfText,
         forceInterLine: Boolean = false,
-        interLine: Float? = null,
+        interLine: Float? = null
     ) : this(listOf(text.copy(margin = Spacing.NONE)), forceInterLine, interLine)
 
     constructor(
         text: String,
         forceInterLine: Boolean = false,
         interLine: Float? = null,
-    ) : this(PdfText(text), forceInterLine, interLine)
+        bodyAlign: BodyAlign? = null
+    ) : this(PdfText(text = text, bodyAlign = bodyAlign), forceInterLine, interLine)
 
 
     fun getTextWidth(context: PdfContext): Float {

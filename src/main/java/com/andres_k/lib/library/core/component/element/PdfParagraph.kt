@@ -70,6 +70,7 @@ data class PdfParagraph private constructor(
         identifier: String? = null,
         position: Position = Position.ORIGIN,
         bodyAlign: BodyAlign? = null,
+        textAlign: BodyAlign? = null,
         padding: Spacing = Spacing.NONE,
         margin: Spacing = Spacing.NONE,
         splitOnOverdraw: Boolean = true,
@@ -77,7 +78,7 @@ data class PdfParagraph private constructor(
         background: Background = Background.NONE,
         borders: Borders = Borders.NONE,
     ) : this(
-        lines = text.lines().map { PdfTextLine(it) },
+        lines = text.lines().map { PdfTextLine(text = it, bodyAlign = textAlign) },
         interLine = interLine,
         splitOnOverdraw = splitOnOverdraw,
         identifier = identifier,
@@ -93,10 +94,10 @@ data class PdfParagraph private constructor(
     )
 
     override fun buildContent(context: PdfContext, request: Box2dRequest, parent: BoxSize): PdfComponent {
-        val calcPos = Position(calcX(request, parent.width), calcY(request, parent.height), PosProperty.FIXED)
-        val calcWidth: Float = calcWidth(request, parent.width)
+        val calcPos = Position(calcX(request, parent), calcY(request, parent), PosProperty.FIXED)
+        val calcWidth: Float = calcWidth(request, parent)
             ?: throw IllegalArgumentException("[BuildContent] PdfTextArea requires a width at build step")
-        val calcHeight: Float? = calcHeight(request, parent.height)
+        val calcHeight: Float? = calcHeight(request, parent)
         val containerWidth: Float = calcWidth - padding.spacingX()
         val containerHeight: Float? = if (calcHeight != null) calcHeight - padding.spacingY() else null
 
@@ -120,7 +121,7 @@ data class PdfParagraph private constructor(
             var cursorX = 0f
 
             val items = line.items.map {
-                val item = it.build(context, Box2dRequest(x = cursorX, y = cursorY), BoxSize(containerWidth, containerHeight)) as PdfText
+                val item = it.build(context, Box2dRequest(x = cursorX, y = cursorY), BoxSize(containerWidth, containerHeight, type)) as PdfText
                 cursorX += item.width()
                 item
             }
@@ -133,7 +134,7 @@ data class PdfParagraph private constructor(
     }
 
     override fun calcMaxSize(context: PdfContext, parent: BoxSize): SizeResult {
-        val calcWidth: Float = calcWidth(null, parent.width)!!
+        val calcWidth: Float = calcWidth(null, parent)!!
         val containerWidth = calcWidth - padding.spacingX()
 
         var maxHeight = 0f
@@ -275,15 +276,17 @@ data class PdfParagraph private constructor(
             line.items.map { it.draw(context = context, parent = body) }.flatten()
         }.flatten()
 
-        return listOf(PdfDrawnElement(
-            x = body.x,
-            y = body.y,
-            xAbs = body.x - padding.left,
-            yAbs = body.y - padding.top,
-            type = type,
-            identifier = identifier,
-            text = null
-        )) + drawLines
+        return listOf(
+            PdfDrawnElement(
+                x = body.x,
+                y = body.y,
+                xAbs = body.x - padding.left,
+                yAbs = body.y - padding.top,
+                type = type,
+                identifier = identifier,
+                text = null
+            )
+        ) + drawLines
     }
 
     private fun getInterLine(line: PdfTextLine, isLastLine: Boolean, properties: PdfProperties): Float {

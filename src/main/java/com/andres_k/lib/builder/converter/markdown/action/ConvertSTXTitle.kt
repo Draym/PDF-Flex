@@ -28,6 +28,7 @@ object ConvertSTXTitle : MarkdownAction {
     ): PdfText {
         val margin = markdown.margin(node.type)
         val font = markdown.font(node.type)
+        val align = markdown.align(node.type)
         val contentText = node.findChildOfType(MarkdownTokenTypes.SETEXT_CONTENT)?.findChildOfType(MarkdownTokenTypes.TEXT)
 
         return if (contentText != null) {
@@ -38,7 +39,8 @@ object ConvertSTXTitle : MarkdownAction {
             font = font.first.code,
             fontSize = font.second,
             borders = Borders.BOTTOM(thickness = if (node.type == MarkdownTokenTypes.SETEXT_1) 3f else 1.5f),
-            margin = margin.merge(bottom = 10f)
+            margin = margin.merge(bottom = 10f),
+            bodyAlign = align
         )
     }
 }

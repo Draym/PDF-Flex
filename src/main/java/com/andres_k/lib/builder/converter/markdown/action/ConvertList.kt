@@ -24,13 +24,15 @@ object ConvertList : MarkdownAction {
     ): PdfView {
         val margin = markdown.margin(node.type)
         val padding = markdown.padding(node.type)
+        val align = markdown.align(node.type)
 
         val rows = MarkdownConverter.analyseNodeChildren(node, config, markdown, context)
         return PdfView(
             elements = rows,
             margin = margin,
             padding = padding.merge(left = config.defaultPadding),
-            size = Size.FULL
+            size = Size.FULL,
+            bodyAlign = align
         )
     }
 }

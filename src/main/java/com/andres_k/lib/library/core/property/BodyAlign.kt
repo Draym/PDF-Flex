@@ -12,7 +12,12 @@ data class BodyAlign(
     val vertical: AlignVertical = AlignVertical.TOP
 ) {
     companion object {
-        val CENTER = BodyAlign(AlignHorizontal.CENTER, AlignVertical.CENTER)
+        val CENTER = BodyAlign(AlignHorizontal.CENTER, AlignVertical.NONE)
+        val BOTTOM = BodyAlign(AlignHorizontal.NONE, AlignVertical.BOTTOM)
+        val TOP = BodyAlign(AlignHorizontal.NONE, AlignVertical.TOP)
+        val RIGHT = BodyAlign(AlignHorizontal.RIGHT, AlignVertical.NONE)
+        val LEFT = BodyAlign(AlignHorizontal.LEFT, AlignVertical.NONE)
+        val CENTER_CENTER = BodyAlign(AlignHorizontal.CENTER, AlignVertical.CENTER)
         val CENTER_RIGHT = BodyAlign(AlignHorizontal.RIGHT, AlignVertical.CENTER)
         val CENTER_LEFT = BodyAlign(AlignHorizontal.LEFT, AlignVertical.CENTER)
         val TOP_CENTER = BodyAlign(AlignHorizontal.CENTER, AlignVertical.TOP)
@@ -25,6 +30,11 @@ data class BodyAlign(
 }
 
 enum class AlignHorizontal {
+    NONE {
+        override fun transform(child: Box2d, margin: Spacing, parent: Box2d): Float? {
+            return null
+        }
+    },
     LEFT {
         override fun transform(child: Box2d, margin: Spacing, parent: Box2d): Float {
             return margin.left
@@ -43,10 +53,15 @@ enum class AlignHorizontal {
         }
     };
 
-    abstract fun transform(child: Box2d, margin: Spacing, parent: Box2d): Float
+    abstract fun transform(child: Box2d, margin: Spacing, parent: Box2d): Float?
 }
 
 enum class AlignVertical {
+    NONE {
+        override fun transform(child: Box2d, margin: Spacing, parent: Box2d): Float? {
+            return null
+        }
+    },
     TOP {
         override fun transform(child: Box2d, margin: Spacing, parent: Box2d): Float {
             return margin.top
@@ -65,5 +80,5 @@ enum class AlignVertical {
         }
     };
 
-    abstract fun transform(child: Box2d, margin: Spacing, parent: Box2d): Float
+    abstract fun transform(child: Box2d, margin: Spacing, parent: Box2d): Float?
 }

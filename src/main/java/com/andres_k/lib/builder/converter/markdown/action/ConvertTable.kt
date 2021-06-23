@@ -7,6 +7,7 @@ import com.andres_k.lib.library.core.component.container.PdfCol
 import com.andres_k.lib.library.core.component.custom.PdfTextLine
 import com.andres_k.lib.library.core.component.element.PdfParagraph
 import com.andres_k.lib.library.core.component.element.PdfTable
+import com.andres_k.lib.library.core.property.SizeAttr
 import org.intellij.markdown.ast.ASTNode
 import org.intellij.markdown.ast.findChildOfType
 import org.intellij.markdown.flavours.gfm.GFMElementTypes
@@ -21,11 +22,13 @@ object ConvertTable : MarkdownAction {
 
     private fun getCols(row: ASTNode, markdown: MarkdownConverterConfig, config: PdfConverterConfig): List<PdfCol> {
         val padding = markdown.padding(GFMTokenTypes.CELL)
+        val nbCols = row.children.count { it.type == GFMTokenTypes.CELL }
+        val colSize = 100f / nbCols
 
         return row.children.mapIndexedNotNull { index, child ->
             if (child.type == GFMTokenTypes.CELL) {
                 val text = PdfParagraph(listOf(PdfTextLine(ConvertText.extractText(child, markdown, config))))
-                PdfCol(content = text, padding = padding)
+                PdfCol(content = text, padding = padding, maxWidth = SizeAttr.percent(colSize))
             } else null
         }
     }
@@ -56,6 +59,7 @@ object ConvertTable : MarkdownAction {
     ): PdfTable {
         val margin = markdown.margin(node.type)
         val padding = markdown.padding(node.type)
+        val align = markdown.align(node.type)
         val header = getHeader(node, markdown, config)
         val rows = getRows(node, markdown, config)
 
@@ -63,7 +67,9 @@ object ConvertTable : MarkdownAction {
             header = header,
             rows = rows,
             margin = margin,
-            padding = padding
+            padding = padding,
+            bodyAlign = align,
+            maxWidth = SizeAttr.full()
         )
     }
 }

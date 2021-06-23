@@ -23,6 +23,7 @@ object ConvertItalic : MarkdownAction {
         context: MarkdownConverterContext,
     ): PdfText {
         val margin = markdown.margin(node.type)
+        val align = markdown.align(node.type)
         val fontItalic = config.getDefaultItalicFont()
         var text = ""
         node.children.forEach { child ->
@@ -34,7 +35,8 @@ object ConvertItalic : MarkdownAction {
             text = text,
             font = fontItalic,
             fontSize = config.defaultFontSize,
-            margin = margin
+            margin = margin,
+            bodyAlign = align
         )
     }
 }
