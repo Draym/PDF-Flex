@@ -69,13 +69,13 @@ data class PdfPage private constructor(
 
         /** Build Header & Footer **/
         val contextPage = PdfContext(properties, null, pageProperties, pageBody, debug)
-        val calculatedHeader = header?.build(contextPage, Box2dRequest.ORIGIN, BoxSize(pageBody.width, pageBody.height))
-        val calculatedFooter = footer?.build(contextPage, Box2dRequest.ORIGIN, BoxSize(pageBody.width, pageBody.height))
+        val calculatedHeader = header?.build(contextPage, Box2dRequest.ORIGIN, BoxSize(pageBody.width, pageBody.height, PdfComponent.Type.PAGE))
+        val calculatedFooter = footer?.build(contextPage, Box2dRequest.ORIGIN, BoxSize(pageBody.width, pageBody.height, PdfComponent.Type.PAGE))
 
         /** Build Content **/
         val viewBody = getContentBody(calculatedHeader?.content, calculatedFooter?.content)
         val contextCalculation = PdfContext(properties, null, pageProperties, viewBody, debug)
-        val calculatedView = view.build(contextCalculation, Box2dRequest.ORIGIN, BoxSize(viewBody.width, viewBody.height)) as PdfView
+        val calculatedView = view.build(contextCalculation, Box2dRequest.ORIGIN, BoxSize(viewBody.width, viewBody.height, PdfComponent.Type.PAGE)) as PdfView
 
         /** return calculated PdfPage **/
         return this.copy(view = calculatedView, header = calculatedHeader, footer = calculatedFooter)

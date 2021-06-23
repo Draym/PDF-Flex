@@ -25,7 +25,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font
  * Base Impl without additional styling
  * Use MarkdownConverter to generate PDFlex components from text input
  */
-class MarkdownToPDF(
+open class MarkdownToPDF(
     private val content: String,
     paddingX: Float? = null,
     paddingY: Float? = null,

@@ -1,5 +1,7 @@
 package com.andres_k.lib.library.core.property
 
+import com.andres_k.lib.library.core.component.PdfComponent
+
 /**
  * Created on 2020/07/20.
  *
@@ -8,7 +10,7 @@ package com.andres_k.lib.library.core.property
 
 
 /** PIXEL **/
-data class BoxSize(val width: Float?, val height: Float?)
+data class BoxSize(val width: Float?, val height: Float?, val type: PdfComponent.Type)
 
 data class SizeResult(val width: Float, val height: Float)
 

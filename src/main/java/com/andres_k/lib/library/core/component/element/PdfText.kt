@@ -77,7 +77,7 @@ data class PdfText private constructor(
     }
 
     override fun buildContent(context: PdfContext, request: Box2dRequest, parent: BoxSize): PdfText {
-        val calcPos = Position(calcX(request, parent.width), calcY(request, parent.height), PosProperty.FIXED)
+        val calcPos = Position(calcX(request, parent), calcY(request, parent), PosProperty.FIXED)
 
         //println("text pos = $calcPos")
         return this.copy(

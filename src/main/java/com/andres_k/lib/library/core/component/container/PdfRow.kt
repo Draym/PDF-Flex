@@ -101,9 +101,9 @@ data class PdfRow private constructor(
     }
 
     override fun buildContent(context: PdfContext, request: Box2dRequest, parent: BoxSize): PdfComponent {
-        val calcPos = Position(calcX(request, parent.width), calcY(request, parent.height), PosProperty.FIXED)
-        val calcWidth: Float? = calcWidth(request, parent.width)
-        val calcHeight: Float? = calcHeight(request, parent.height)
+        val calcPos = Position(calcX(request, parent), calcY(request, parent), PosProperty.FIXED)
+        val calcWidth: Float? = calcWidth(request, parent)
+        val calcHeight: Float? = calcHeight(request, parent)
         val containerWidth: Float? = if (calcWidth != null) calcWidth - padding.spacingX() else null
         val containerHeight: Float? = if (calcHeight != null) calcHeight - padding.spacingY() else null
 
@@ -115,7 +115,7 @@ data class PdfRow private constructor(
         var maxHeight = 0f
 
         elements.forEach {
-            val itSize = it.calcMaxSize(context = context, parent = BoxSize(containerWidth, containerHeight))
+            val itSize = it.calcMaxSize(context = context, parent = BoxSize(containerWidth, containerHeight, type))
             if (itSize.height.bigger(maxHeight)) {
                 maxHeight = itSize.height
             }
@@ -124,7 +124,7 @@ data class PdfRow private constructor(
         val calcElements: MutableList<PdfComponent> = arrayListOf()
          elements.forEach calculate@{
             val item = it.build(context, Box2dRequest(cursorX), BoxSize(containerWidth, containerHeight
-                ?: maxHeight))
+                ?: maxHeight, type))
             //println("create col on $cursorX, $calcWidth, {$calcHeight?:$maxHeight} -> ${item.size.width}; ${item.width()}")
             cursorX += item.width()
 
@@ -138,8 +138,8 @@ data class PdfRow private constructor(
     }
 
     override fun calcMaxSize(context: PdfContext, parent: BoxSize): SizeResult {
-        val calcWidth: Float? = calcWidth(null, parent.width, true)
-        val calcHeight: Float? = calcHeight(null, parent.height, true)
+        val calcWidth: Float? = calcWidth(null, parent, true)
+        val calcHeight: Float? = calcHeight(null, parent, true)
         val containerWidth: Float? = if (calcWidth != null) calcWidth - padding.spacingX() else null
         val containerHeight: Float? = if (calcHeight != null) calcHeight - padding.spacingY() else null
 
@@ -148,7 +148,7 @@ data class PdfRow private constructor(
         var maxHeight = 0f
 
         elements.forEach {
-            val itSize = it.calcMaxSize(context = context, parent = BoxSize(containerWidth, containerHeight))
+            val itSize = it.calcMaxSize(context = context, parent = BoxSize(containerWidth, containerHeight, type))
             if (itSize.height.bigger(maxHeight)) {
                 maxHeight = itSize.height
             }

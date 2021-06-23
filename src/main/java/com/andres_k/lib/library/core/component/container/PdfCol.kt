@@ -54,19 +54,19 @@ data class PdfCol private constructor(
     }
 
     override fun buildContent(context: PdfContext, request: Box2dRequest, parent: BoxSize): PdfComponent {
-        val calcPos = Position(calcX(request, parent.width), calcY(request, parent.height), PosProperty.FIXED)
-        val calcWidth: Float? = calcWidth(request, parent.width)
-        val calcHeight: Float? = calcHeight(request, parent.height)
+        val calcPos = Position(calcX(request, parent), calcY(request, parent), PosProperty.FIXED)
+        val calcWidth: Float? = calcWidth(request, parent)
+        val calcHeight: Float? = calcHeight(request, parent)
         val containerWidth: Float? = if (calcWidth != null) calcWidth - padding.spacingX() else null
         val containerHeight: Float? = if (calcHeight != null) calcHeight - padding.spacingY() else null
 
         //println("New col : $calcWidth ; $calcHeight ($parentWidth; $parentHeight) $containerWidth, $containerHeight")
 
-        var maxWidth = content()?.calcMaxSize(context = context, parent = BoxSize(containerWidth, containerHeight))?.width
+        var maxWidth = content()?.calcMaxSize(context = context, parent = BoxSize(containerWidth, containerHeight, type))?.width
             ?: 0f
 
         val calcElement = content()?.build(context, Box2dRequest(), BoxSize(containerWidth
-            ?: maxWidth, containerHeight))
+            ?: maxWidth, containerHeight, type))
 
         maxWidth = calcWidth ?: maxWidth + padding.spacingX()
         val maxHeight = calcHeight ?: (calcElement?.height() ?: 0f) + padding.spacingY()
@@ -75,12 +75,12 @@ data class PdfCol private constructor(
     }
 
     override fun calcMaxSize(context: PdfContext, parent: BoxSize): SizeResult {
-        val calcWidth: Float? = calcWidth(null, parent.width, true)
-        val calcHeight: Float? = calcHeight(null, parent.height, true)
+        val calcWidth: Float? = calcWidth(null, parent, true)
+        val calcHeight: Float? = calcHeight(null, parent, true)
         val containerWidth: Float? = if (calcWidth != null) calcWidth - padding.spacingX() else null
         val containerHeight: Float? = if (calcHeight != null) calcHeight - padding.spacingY() else null
 
-        val contentSizes = content()?.calcMaxSize(context = context, parent = BoxSize(containerWidth, containerHeight))
+        val contentSizes = content()?.calcMaxSize(context = context, parent = BoxSize(containerWidth, containerHeight, type))
             ?: SizeResult(0f, 0f)
 
         //println("** col return ${SizeAttr(contentSizes.width + padding.spacingX() + margin.spacingX(), contentSizes.height + padding.spacingY() + margin.spacingY())}")

@@ -89,7 +89,7 @@ data class PdfPageNbAttr private constructor(
             width = FontUtils.getTextWidth(getValue(context), font.font, getFontSize(context)),
             height = FontUtils.getTextHeight(font.font, getFontSize(context))
         )
-        val calcPos = Position(calcX(request, parent.width), calcY(request, parent.height), PosProperty.FIXED)
+        val calcPos = Position(calcX(request, parent), calcY(request, parent), PosProperty.FIXED)
         return this.copy(font = getFont(context).code, fontSize = getFontSize(context), position = calcPos, size = size, isBuilt = true)
     }
 

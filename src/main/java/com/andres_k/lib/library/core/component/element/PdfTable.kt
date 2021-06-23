@@ -158,13 +158,13 @@ data class PdfTable private constructor(
     }
 
     override fun buildContent(context: PdfContext, request: Box2dRequest, parent: BoxSize): PdfComponent {
-        val calcPos = Position(calcX(request, parent.width), calcY(request, parent.height), PosProperty.FIXED)
-        val calcWidth: Float? = calcWidth(request, parent.width)
-        val calcHeight: Float? = calcHeight(request, parent.height)
+        val calcPos = Position(calcX(request, parent), calcY(request, parent), PosProperty.FIXED)
+        val calcWidth: Float? = calcWidth(request, parent)
+        val calcHeight: Float? = calcHeight(request, parent)
         val containerWidth: Float? = if (calcWidth != null) calcWidth - padding.spacingX() else null
         val containerHeight: Float? = if (calcHeight != null) calcHeight - padding.spacingY() else null
 
-        val bodyBox = BoxSize(containerWidth, containerHeight)
+        val bodyBox = BoxSize(containerWidth, containerHeight, type)
 
         val savedMaxWidth: MutableMap<Int, Float> = mutableMapOf()
         val savedMaxHeight: MutableMap<Int, Float> = mutableMapOf()
@@ -230,8 +230,8 @@ data class PdfTable private constructor(
     }
 
     override fun calcMaxSize(context: PdfContext, parent: BoxSize): SizeResult {
-        val calcWidth: Float? = calcWidth(null, parent.width, true)
-        val calcHeight: Float? = calcHeight(null, parent.height, true)
+        val calcWidth: Float? = calcWidth(null, parent, true)
+        val calcHeight: Float? = calcHeight(null, parent, true)
         val containerWidth: Float? = if (calcWidth != null) calcWidth - padding.spacingX() else null
         val containerHeight: Float? = if (calcHeight != null) calcHeight - padding.spacingY() else null
 
@@ -243,7 +243,7 @@ data class PdfTable private constructor(
         (listOf(header) + rows).forEachIndexed { i1, row ->
             var maxHeight = 0f
             row.forEachIndexed { i2, col ->
-                val itSize = col.calcMaxSize(context = context, parent = BoxSize(containerWidth, containerHeight))
+                val itSize = col.calcMaxSize(context = context, parent = BoxSize(containerWidth, containerHeight, type))
                 if (i1 == 0 && col.size.width != null) {
                     fixedWidthIndexes.add(i2)
                     if (col.size.width.isPercentage && containerWidth == null) {

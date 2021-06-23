@@ -1,6 +1,6 @@
 package com.andres_k.lib.builder.converter
 
-import com.andres_k.lib.builder.converter.markdown.interpreter.CustomInterpreter
+import com.andres_k.lib.builder.converter.utils.interpreter.CustomInterpreter
 import com.andres_k.lib.builder.converter.utils.symbol.BulletPicker
 import com.andres_k.lib.builder.converter.utils.symbol.NumericalPicker
 import com.andres_k.lib.builder.converter.utils.symbol.SymbolPicker

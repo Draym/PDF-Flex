@@ -78,7 +78,7 @@ data class PdfImage private constructor(
     }
 
     override fun buildContent(context: PdfContext, request: Box2dRequest, parent: BoxSize): PdfImage {
-        val calcPos = Position(calcX(request, parent.width), calcY(request, parent.height), PosProperty.FIXED)
+        val calcPos = Position(calcX(request, parent), calcY(request, parent), PosProperty.FIXED)
         val resized = calcImageResize(parent)
         return this.copy(size = Size(resized.width, resized.height), position = calcPos, isBuilt = true)
     }
