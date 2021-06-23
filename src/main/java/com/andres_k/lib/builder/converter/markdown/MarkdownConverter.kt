@@ -175,7 +175,11 @@ object MarkdownConverter {
      * Utility function to stringify a Node
      * helpful for logs
      */
-    fun stringifyNode(text: String, node: ASTNode, level: Int = 0): String {
+    fun stringifyNode(text: String, node: ASTNode): String {
+        return stringifyNode(text, node, 0)
+    }
+
+    private fun stringifyNode(text: String, node: ASTNode, level: Int): String {
         val builder = StringBuilder()
 
         builder.append("|")
