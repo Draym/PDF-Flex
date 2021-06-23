@@ -163,8 +163,6 @@ object MarkdownConverter {
     ): List<PdfComponent> {
         val node = buildNodeTree(text, descriptor)
 
-        println(stringifyNode(text, node))
-
         return analyseNodeChildren(
             node = node,
             config = config,
