@@ -9,6 +9,7 @@ import com.andres_k.lib.library.output.OutputBuilder
 import com.andres_k.lib.library.utils.EFont
 import com.andres_k.lib.library.utils.FontCode
 import com.andres_k.lib.library.utils.PdfFontLoader
+import com.andres_k.lib.library.utils.config.PdfContextDebug
 import com.andres_k.lib.library.utils.config.PdfProperties
 import com.andres_k.lib.library.utils.data.PdfMetadata
 import com.andres_k.lib.parser.PdfExplorer
@@ -45,6 +46,7 @@ abstract class PdfBaseTemplate(
 
         // SETUP
         val defaultProperties = getPdfDefaultProperties().copy(availableFont = loadedFont)
+        val debugSettings = getPdfDefaultDebugSettings()
 
         // DRAW
         return document.draw(
@@ -52,7 +54,8 @@ abstract class PdfBaseTemplate(
             pages = pages,
             header = header,
             footer = footer,
-            properties = defaultProperties
+            properties = defaultProperties,
+            debug = debugSettings
         )
     }
 
@@ -68,6 +71,7 @@ abstract class PdfBaseTemplate(
     protected abstract fun createFooter(): PdfFooter?
     protected abstract fun createPages(): List<PdfPage>
     protected abstract fun getPdfDefaultProperties(): PdfProperties
+    protected abstract fun getPdfDefaultDebugSettings(): PdfContextDebug
 
     override fun close() {
         document.close()
