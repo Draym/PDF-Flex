@@ -80,7 +80,7 @@ class MyTemplate() : PdfBaseTemplate() {
 - PDF-Flex use TrueTypeFont type, you can use the utility tools [FontUtils](https://github.com/Draym/pdf-flex/wiki/Tools#fontutil) to load your own font
 
 ````kotlin
-    override fun getFontToLoad(): Map<EFont, TrueTypeFont> {
+override fun getFontToLoad(): Map<EFont, TrueTypeFont> {
     return mapOf(
         BaseFont.DEFAULT to FontUtils.loadTTCFont(YAHEI_CLASSIC.fontPath, YAHEI_CLASSIC.fontName),
         BaseFont.BOLD to FontUtils.loadTTCFont(YAHEI_BOLD.fontPath, YAHEI_BOLD.fontName)
@@ -97,7 +97,7 @@ Let's see an example on how to create a logo header. Here we import an image as 
 to [PdfImageLoader](https://github.com/Draym/pdf-flex/wiki/Tools#pdfimageloader) with an image file from the /resources folder.
 
 ````kotlin
-    override fun createHeader(): PdfHeader {
+override fun createHeader(): PdfHeader {
     val logo: PDImageXObject = PdfImageLoader.loadFrom(document.document, "/images/logo.png")
 
     // create an image component, the bodyAlign attribute will center the image into the row
@@ -118,7 +118,7 @@ to [PdfImageLoader](https://github.com/Draym/pdf-flex/wiki/Tools#pdfimageloader)
 Let's construct a PDF which contains a title, and a list of messages. Visit the [components wiki](https://github.com/Draym/pdf-flex/wiki/Core-Components) for more examples.
 
 ````kotlin
-   override fun createPages(): List<PdfPage> {
+override fun createPages(): List<PdfPage> {
     val fontB = BaseFont.BOLD.code
 
     /** Title **/
@@ -144,7 +144,7 @@ Let's construct a PDF which contains a title, and a list of messages. Visit the 
             }.flatten(),
         bodyAlign = BodyAlign.TOP_LEFT
     )
-                      
+
     // add the paragraph into the second row
     val rowParagraph = PdfRow(
         elements = listOf(myTitle),
@@ -169,7 +169,7 @@ Let's construct a PDF which contains a title, and a list of messages. Visit the 
 You can define some settings to send to the Builder or keep the default one.
 
 ````kotlin
-    override fun getPdfDefaultProperties(): PdfProperties {
+override fun getPdfDefaultProperties(): PdfProperties {
     return PdfProperties(
         defaultFontSize = 11f,
         defaultInterline = 2f, // the size between each lines
@@ -186,7 +186,7 @@ You can also define how the visual DebugContext works by modifying the way it pr
 must set debugOn = false into PdfProperties for final rendering.
 
 ````kotlin
-    override fun getPdfDefaultDebugSettings(): PdfContextDebug {
+override fun getPdfDefaultDebugSettings(): PdfContextDebug {
     return PdfContextDebug(
         borders = mapOf(
             Type.ROW to Border(Color.RED.withAlpha(0.5f)),
