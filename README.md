@@ -22,7 +22,7 @@ It has been developed in an effort of creating a complete easy-to-use high-level
 - Include base PDF template
     - trouble-less configuration
     - open for customization
-- Include pre-define output export support: Stream, File, Bytes
+- Include pre-defined output export support: Stream, File, Bytes
 - Markdown parser and converter to PDF
     - using [Jetbrains/markdown](https://github.com/JetBrains/markdown) extensible parser
     - open to extension with custom interpreters
@@ -51,7 +51,7 @@ The documentation is available on the [WIKI](https://github.com/Draym/pdf-flex/w
 
 The default way to generate PDF using PDF-Flex is to follow the following steps:
 
-- create a template by extend the abstract base template **PDFBaseTemplate**
+- create a template by extending the abstract base template **PDFBaseTemplate**
 - override the necessary methods to define the comportment of your template
 - build the template
 - provide an output using the provided factory **OutputBuilder** or use a custom one
@@ -59,7 +59,7 @@ The default way to generate PDF using PDF-Flex is to follow the following steps:
 
 ### Create a template
 
-Extend the default Template which define the overall structure.
+Extend the default Template which defines the overall structure.
 
 ````kotlin
 class MyTemplate() : PdfBaseTemplate() {
@@ -74,7 +74,7 @@ class MyTemplate() : PdfBaseTemplate() {
 
 #### Define the font you wish to use
 
-- A fond is associated to a code, you will then use this code when creating a new component. This will allow the font to be saved only once in the builder and be use only when the
+- A fond is associated to a code, you will then use this code when creating a new component. This will allow the font to be saved only once in the builder and be used only when the
   builder will write out the PDF.
 - For convenience, we usually use **BaseFont** which define default, bold and italic code. Still you can define and use as many Fonts as you wish within your document.
 
@@ -146,7 +146,7 @@ override fun createPages(): List<PdfPage> {
     )
 
     /** Paragraph **/
-    // now let's create some paragraph, the lines will be adjusted during the build to fit its parent width, if it overdraw, a new line will be created
+    // now let's create some paragraph, the lines will be adjusted during the build to fit its parent width, if it overdraws, a new line will be created
 
     // the default impl does not automatically handle the '\n' character, you have to split the lines ahead
     val messages = listOf("This library is awesome.", "Let's try every available components.\nEnd of text.")
@@ -168,7 +168,7 @@ override fun createPages(): List<PdfPage> {
         bodyAlign = BodyAlign.TOP_LEFT
     )
 
-    // If you put both paragraph into the row, and do not set paragraph width, by default it will take 100% of parent /!\
+    // If you put both paragraph into the row, and do not set paragraph width, by default it will take 100% of its parent /!\
     // In order to put multiple expandable components, such as paragraph, into a row, we should use columns
     val rowParagraph = PdfRow(
         elements = listOf(
@@ -202,8 +202,8 @@ override fun getPdfDefaultProperties(): PdfProperties {
         defaultInterline = 2f, // the size between each lines
         debugOn = true, // if true it will draw additional lines such as container borders to help you debug your design, you can customize it using PdfContextDebug
         color = Color.BLACK, // default component colors (font, border..)
-        drawOverflowX = true, // do not cut the components if they happens to draw on each other
-        drawOverflowY = true, // do not cut the components if they happens to draw on each other
+        drawOverflowX = true, // do not cut the components if they happen to draw on each other
+        drawOverflowY = true, // do not cut the components if they happen to draw on each other
         createPageOnOverdraw = true // automatically create new pages
     )
 }
