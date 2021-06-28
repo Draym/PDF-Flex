@@ -1,10 +1,10 @@
 PDF-Flex
 =======
 
-PDF-Flex is a library that can be used to easily create generic components within a PDF. It uses [Apache pdfbox](https://github.com/apache/pdfbox) as it's root while abstracting
+PDF-Flex is a library that can be used to easily compose responsive components within a PDF. It uses [Apache pdfbox](https://github.com/apache/pdfbox) as it's root while abstracting
 the api into a harmonised set of tools and pre-defined components.
 
-PDF-Flex is designed within a grid system which allows the components within the PDF to adjust against each-others. Thanks to it, it's now easier to create complex design with
+PDF-Flex is designed within a responsive system which allows the components within the PDF to adjust against each-others. Thanks to it, it's now easier to create complex design with
 generic and adjustable, both in width & height, component within a PDF.
 
 It allows easier usage of Paragraph, Table, Rows and support multi-page implementation.
