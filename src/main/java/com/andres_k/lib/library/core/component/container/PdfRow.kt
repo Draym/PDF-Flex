@@ -1,5 +1,6 @@
 package com.andres_k.lib.library.core.component.container
 
+import com.andres_k.lib.library.core.component.ComponentTypeCode
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.*
@@ -25,7 +26,7 @@ data class PdfRow private constructor(
     override val background: Background,
     override val borders: Borders,
     override val isBuilt: Boolean
-) : PdfContainer(elements, splitOnOverdraw, identifier, position, size, null, padding, margin, color, background, borders, isBuilt, Type.ROW) {
+) : PdfContainer(elements, splitOnOverdraw, identifier, position, size, null, padding, margin, color, background, borders, isBuilt, ComponentTypeCode.ROW.type) {
 
     constructor(
         elements: List<PdfComponent>,
@@ -89,8 +90,10 @@ data class PdfRow private constructor(
                 val finalOverdrawElements = overdrawElements.map { col -> col.copyAbs<PdfComponent>(size = Size(col.size.width?.v, overdrawHeight)) }
 
                 val mainRow = if (finalDrawElements.isNotEmpty()) this.copy(elements = finalDrawElements, size = Size(size.width?.v, drawHeight + padding.spacingY())) else null
-                PdfOverdrawResult(main = mainRow,
-                    overdraw = this.copy(elements = finalOverdrawElements, size = Size(size.width?.v, overdrawHeight + padding.spacingY())))
+                PdfOverdrawResult(
+                    main = mainRow,
+                    overdraw = this.copy(elements = finalOverdrawElements, size = Size(size.width?.v, overdrawHeight + padding.spacingY()))
+                )
             } else {
                 if (this.height().eqOrBigger(context.viewBody.height)) {
                     throw IllegalArgumentException("[PdfRow] The height of the Row is superior to a page's height. splitOnOverdraw has to be set to True")
@@ -122,9 +125,13 @@ data class PdfRow private constructor(
         }
 
         val calcElements: MutableList<PdfComponent> = arrayListOf()
-         elements.forEach calculate@{
-            val item = it.build(context, Box2dRequest(cursorX), BoxSize(containerWidth, containerHeight
-                ?: maxHeight, type))
+        elements.forEach calculate@{
+            val item = it.build(
+                context, Box2dRequest(cursorX), BoxSize(
+                    containerWidth, containerHeight
+                        ?: maxHeight, type
+                )
+            )
             //println("create col on $cursorX, $calcWidth, {$calcHeight?:$maxHeight} -> ${item.size.width}; ${item.width()}")
             cursorX += item.width()
 

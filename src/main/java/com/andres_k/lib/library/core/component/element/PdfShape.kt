@@ -1,5 +1,6 @@
 package com.andres_k.lib.library.core.component.element
 
+import com.andres_k.lib.library.core.component.ComponentTypeCode
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.DrawUtils
@@ -24,7 +25,7 @@ data class PdfShape(
     override val color: Color? = null,
     override val background: Background = Background.NONE,
     override val isBuilt: Boolean = true
-) : PdfComponent(identifier, Position.ORIGIN, Size.NONE, null, Spacing.NONE, Spacing.NONE, color, background, Borders.NONE, isBuilt, Type.SHAPE) {
+) : PdfComponent(identifier, Position.ORIGIN, Size.NONE, null, Spacing.NONE, Spacing.NONE, color, background, Borders.NONE, isBuilt, ComponentTypeCode.SHAPE.type) {
 
     override fun drawContent(context: PdfContext, body: Box2d): List<PdfDrawnElement> {
         val parentX = if (respectParent) body.x else context.viewBody.x
@@ -47,6 +48,8 @@ data class PdfShape(
             y = body.y,
             xAbs = body.x - padding.left,
             yAbs = body.y - padding.top,
+            width = body.width,
+            height = body.height,
             type = type,
             identifier = identifier,
             text = null

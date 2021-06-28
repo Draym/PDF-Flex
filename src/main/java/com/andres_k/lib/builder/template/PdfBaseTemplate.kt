@@ -3,13 +3,12 @@ package com.andres_k.lib.builder.template
 import com.andres_k.lib.builder.PdfBuilder
 import com.andres_k.lib.library.core.component.custom.PdfFooter
 import com.andres_k.lib.library.core.component.custom.PdfHeader
-import com.andres_k.lib.library.holder.PdfDocument
-import com.andres_k.lib.library.holder.PdfPage
+import com.andres_k.lib.library.core.document.PdfDocument
+import com.andres_k.lib.library.core.page.PdfPage
 import com.andres_k.lib.library.output.OutputBuilder
-import com.andres_k.lib.library.utils.EFont
 import com.andres_k.lib.library.utils.FontCode
 import com.andres_k.lib.library.utils.PdfFontLoader
-import com.andres_k.lib.library.utils.config.PdfContextDebug
+import com.andres_k.lib.library.utils.config.PdfDebugContext
 import com.andres_k.lib.library.utils.config.PdfProperties
 import com.andres_k.lib.library.utils.data.PdfMetadata
 import com.andres_k.lib.parser.PdfExplorer
@@ -36,8 +35,10 @@ abstract class PdfBaseTemplate(
      */
     final override fun build(output: OutputBuilder): PdfExplorer {
         // INIT
-        val desiredFont = getFontToLoad()
-        val loadedFont = loadFont(desiredFont)
+        val desiredCustomFont = includeCustomFonts()
+        val loadedFonts = loadFont(desiredCustomFont)
+        val standardFonts = includeStandardFonts()
+        val fonts = standardFonts + loadedFonts
 
         // CREATE
         val header = createHeader()
@@ -45,7 +46,7 @@ abstract class PdfBaseTemplate(
         val pages = createPages()
 
         // SETUP
-        val defaultProperties = getPdfDefaultProperties().copy(availableFont = loadedFont)
+        val defaultProperties = getPdfDefaultProperties().copy(availableFont = fonts)
         val debugSettings = getPdfDefaultDebugSettings()
 
         // DRAW
@@ -59,19 +60,20 @@ abstract class PdfBaseTemplate(
         )
     }
 
-    private fun loadFont(fonts: Map<EFont, TrueTypeFont>): Map<FontCode, PDFont> {
+    private fun loadFont(fonts: Map<FontCode, TrueTypeFont>): Map<FontCode, PDFont> {
         return fonts.map { (key, font) ->
-            key.code to PdfFontLoader.loadTTCFont(document.document, font)
+            key to PdfFontLoader.loadTTCFont(document.document, font)
         }.toMap()
     }
 
-    protected abstract fun getFontToLoad(): Map<EFont, TrueTypeFont>
+    protected abstract fun includeCustomFonts(): Map<FontCode, TrueTypeFont>
+    protected abstract fun includeStandardFonts(): Map<FontCode, PDFont>
 
     protected abstract fun createHeader(): PdfHeader?
     protected abstract fun createFooter(): PdfFooter?
     protected abstract fun createPages(): List<PdfPage>
     protected abstract fun getPdfDefaultProperties(): PdfProperties
-    protected abstract fun getPdfDefaultDebugSettings(): PdfContextDebug
+    protected abstract fun getPdfDefaultDebugSettings(): PdfDebugContext
 
     override fun close() {
         document.close()

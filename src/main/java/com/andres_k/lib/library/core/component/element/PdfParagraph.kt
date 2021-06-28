@@ -1,6 +1,7 @@
 package com.andres_k.lib.library.core.component.element
 
 import com.andres_k.lib.builder.converter.utils.RegexUtil
+import com.andres_k.lib.library.core.component.ComponentTypeCode
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.component.custom.PdfTextLine
 import com.andres_k.lib.library.core.component.custom.addText
@@ -32,7 +33,7 @@ data class PdfParagraph private constructor(
     override val background: Background,
     override val borders: Borders,
     override val isBuilt: Boolean,
-) : PdfComponent(identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.PARAGRAPH) {
+) : PdfComponent(identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, ComponentTypeCode.PARAGRAPH.type) {
 
     constructor(
         lines: List<PdfTextLine>,
@@ -65,12 +66,14 @@ data class PdfParagraph private constructor(
 
     constructor(
         text: String,
+        textAlign: BodyAlign? = null,
+        textFont: FontCode? = null,
+        textFontSize: Float? = null,
         maxWidth: SizeAttr? = null,
         interLine: Float? = null,
         identifier: String? = null,
         position: Position = Position.ORIGIN,
         bodyAlign: BodyAlign? = null,
-        textAlign: BodyAlign? = null,
         padding: Spacing = Spacing.NONE,
         margin: Spacing = Spacing.NONE,
         splitOnOverdraw: Boolean = true,
@@ -78,7 +81,7 @@ data class PdfParagraph private constructor(
         background: Background = Background.NONE,
         borders: Borders = Borders.NONE,
     ) : this(
-        lines = text.lines().map { PdfTextLine(text = it, bodyAlign = textAlign) },
+        lines = text.lines().map { PdfTextLine(text = it, bodyAlign = textAlign, textFont = textFont, textFontSize = textFontSize) },
         interLine = interLine,
         splitOnOverdraw = splitOnOverdraw,
         identifier = identifier,
@@ -282,6 +285,8 @@ data class PdfParagraph private constructor(
                 y = body.y,
                 xAbs = body.x - padding.left,
                 yAbs = body.y - padding.top,
+                width = body.width,
+                height = body.height,
                 type = type,
                 identifier = identifier,
                 text = null

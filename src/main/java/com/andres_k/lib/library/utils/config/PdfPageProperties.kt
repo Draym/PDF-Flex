@@ -8,4 +8,8 @@ package com.andres_k.lib.library.utils.config
 class PdfPageProperties(
     val pageNumber: Int,
     val pageTotal: Int
-)
+) {
+    companion object {
+        val ORIGIN = PdfPageProperties(0, 1)
+    }
+}

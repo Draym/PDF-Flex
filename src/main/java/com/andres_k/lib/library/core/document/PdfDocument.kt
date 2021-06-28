@@ -1,9 +1,10 @@
-package com.andres_k.lib.library.holder
+package com.andres_k.lib.library.core.document
 
 import com.andres_k.lib.library.core.component.custom.PdfFooter
 import com.andres_k.lib.library.core.component.custom.PdfHeader
+import com.andres_k.lib.library.core.page.PdfPage
 import com.andres_k.lib.library.output.OutputBuilder
-import com.andres_k.lib.library.utils.config.PdfContextDebug
+import com.andres_k.lib.library.utils.config.PdfDebugContext
 import com.andres_k.lib.library.utils.config.PdfPageProperties
 import com.andres_k.lib.library.utils.config.PdfProperties
 import com.andres_k.lib.library.utils.data.PdfDrawnPage
@@ -17,7 +18,7 @@ import org.apache.pdfbox.pdmodel.PDPageContentStream
  *
  * @author Kevin Andres
  */
-class PdfDocument(
+open class PdfDocument(
     metadata: PdfMetadata = PdfMetadata.NONE,
 ) : AutoCloseable {
     val document: PDDocument = PDDocument()
@@ -40,12 +41,18 @@ class PdfDocument(
         }
     }
 
-    private fun calculatePages(
+    /**
+     * Calculate the inner components of the Document.
+     * Each expandable & relative components will be given a definitive position (x, y) and a size (width, height)
+     *
+     * @return A new list of Pages where all of they components are built.
+     */
+    private fun calculateDocumentComponents(
         pages: List<PdfPage>,
         header: PdfHeader?,
         footer: PdfFooter?,
         properties: PdfProperties,
-        debug: PdfContextDebug,
+        debug: PdfDebugContext,
     ): List<PdfPage> {
         val mutablePages: MutableList<PdfPage> = pages.toMutableList()
         val resultPages: MutableList<PdfPage> = arrayListOf()
@@ -82,10 +89,10 @@ class PdfDocument(
         header: PdfHeader? = PdfHeader.NONE,
         footer: PdfFooter? = PdfFooter.NONE,
         properties: PdfProperties = PdfProperties.DEFAULT,
-        debug: PdfContextDebug = PdfContextDebug.DEFAULT,
+        debug: PdfDebugContext = PdfDebugContext.DEFAULT,
     ): List<PdfDrawnPage> {
         /** Calculate final pages : done separately to know the total number of page before draw **/
-        val calcPages: List<PdfPage> = calculatePages(pages, header, footer, properties, debug)
+        val calcPages: List<PdfPage> = calculateDocumentComponents(pages, header, footer, properties, debug)
 
         return calcPages.mapIndexed { i, page ->
 
@@ -113,7 +120,7 @@ class PdfDocument(
         header: PdfHeader? = PdfHeader.NONE,
         footer: PdfFooter? = PdfFooter.NONE,
         properties: PdfProperties = PdfProperties.DEFAULT,
-        debug: PdfContextDebug = PdfContextDebug.DEFAULT,
+        debug: PdfDebugContext = PdfDebugContext.DEFAULT,
     ): PdfExplorer {
         builder.validateOutput()
         val drawnPages = computeDocument(

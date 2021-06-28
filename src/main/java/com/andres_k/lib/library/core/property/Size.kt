@@ -1,6 +1,6 @@
 package com.andres_k.lib.library.core.property
 
-import com.andres_k.lib.library.core.component.PdfComponent
+import com.andres_k.lib.library.core.component.ComponentType
 
 /**
  * Created on 2020/07/20.
@@ -10,7 +10,7 @@ import com.andres_k.lib.library.core.component.PdfComponent
 
 
 /** PIXEL **/
-data class BoxSize(val width: Float?, val height: Float?, val type: PdfComponent.Type)
+data class BoxSize(val width: Float?, val height: Float?, val type: ComponentType)
 
 data class SizeResult(val width: Float, val height: Float)
 
@@ -33,6 +33,13 @@ open class Size(val width: SizeAttr? = null, val height: SizeAttr? = null) {
         val NULL = Size()
         val NONE = Size(get(0f), get(0f))
         fun get(value: Float?, isPercentage: Boolean = false): SizeAttr? = if (value != null) SizeAttr(value, isPercentage) else null
+    }
+
+    override fun toString(): String {
+        return "Size(" +
+                "width=" + width +
+                "height=" + height +
+                ")"
     }
 }
 

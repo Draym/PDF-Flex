@@ -15,6 +15,8 @@ data class ElementPositionResult(
     val line: Int,
     private val x: Float,
     private val y: Float,
+    val width: Float,
+    val height: Float,
     val pageWidth: Float,
     val pageHeight: Float,
     val identifier: String? = null

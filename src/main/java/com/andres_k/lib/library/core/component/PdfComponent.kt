@@ -23,7 +23,7 @@ abstract class PdfComponent(
     open val background: Background,
     open val borders: Borders,
     open val isBuilt: Boolean,
-    open val type: Type
+    open val type: ComponentType
 ) {
 
     protected abstract fun buildContent(context: PdfContext, request: Box2dRequest, parent: BoxSize): PdfComponent
@@ -127,21 +127,6 @@ abstract class PdfComponent(
         DrawUtils.drawRect(context.stream(), endX, startY, -padding.right, bodyHeight(), Color.GREEN.withAlpha(0.2f), filled = true)
     }
 
-    enum class Type {
-        COL,
-        ROW,
-        LIST,
-        VIEW,
-        IMAGE,
-        TABLE,
-        TEXT,
-        PARAGRAPH,
-        PAGE,
-        PAGE_NB,
-        PAGE_BREAK,
-        SHAPE
-    }
-
     abstract fun getChildren(): List<PdfComponent>
 
     abstract fun <T : PdfComponent> copyAbs(
@@ -234,8 +219,8 @@ abstract class PdfComponent(
     protected fun bodyY(): Float = y() + margin.top
     protected fun bodyEndX(): Float = bodyX() + bodyWidth()
     protected fun bodyEndY(): Float = bodyY() + bodyHeight()
-    protected fun bodyWidth(): Float = if (size.width != null && !size.width!!.isPercentage) size.width!!.v else throw IllegalArgumentException("[PdfElement] Size need to be recalculated before get width")
-    protected fun bodyHeight(): Float = if (size.height != null && !size.height!!.isPercentage) size.height!!.v else throw IllegalArgumentException("[PdfElement] Size need to be recalculated before get height")
+    protected fun bodyWidth(): Float = if (size.width != null && !size.width!!.isPercentage) size.width!!.v else throw IllegalArgumentException("[PdfElement] Size need to be recalculated before get width (${size.width})")
+    protected fun bodyHeight(): Float = if (size.height != null && !size.height!!.isPercentage) size.height!!.v else throw IllegalArgumentException("[PdfElement] Size need to be recalculated before get height (${size.height})")
 
     protected fun getBody(): Box2d = Box2d(bodyX(), bodyY(), bodyWidth(), bodyHeight())
 

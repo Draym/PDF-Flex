@@ -1,5 +1,6 @@
 package com.andres_k.lib.library.core.component.element
 
+import com.andres_k.lib.library.core.component.ComponentTypeCode
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.DrawUtils
@@ -30,7 +31,7 @@ data class PdfText private constructor(
     override val background: Background,
     override val borders: Borders,
     override val isBuilt: Boolean,
-) : PdfComponent(identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.TEXT) {
+) : PdfComponent(identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, ComponentTypeCode.TEXT.type) {
 
     constructor(
         text: String,
@@ -62,6 +63,8 @@ data class PdfText private constructor(
             y = drawY,
             xAbs = body.x - padding.left,
             yAbs = body.y - padding.top,
+            width = body.width,
+            height = body.height,
             type = type,
             identifier = identifier,
             text = text

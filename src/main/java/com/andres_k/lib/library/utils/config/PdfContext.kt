@@ -13,7 +13,7 @@ data class PdfContext(
     private val stream: PDPageContentStream?,
     val page: PdfPageProperties,
     val viewBody: Box2d,
-    val debug: PdfContextDebug
+    val debug: PdfDebugContext
 ) {
     fun stream(): PDPageContentStream {
         if (stream == null) {

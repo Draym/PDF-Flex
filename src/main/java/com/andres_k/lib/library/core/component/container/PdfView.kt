@@ -1,5 +1,6 @@
 package com.andres_k.lib.library.core.component.container
 
+import com.andres_k.lib.library.core.component.ComponentTypeCode
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.*
@@ -25,7 +26,7 @@ data class PdfView private constructor(
     override val background: Background,
     override val borders: Borders,
     override val isBuilt: Boolean,
-) : PdfContainer(elements, true, identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.VIEW) {
+) : PdfContainer(elements, true, identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, ComponentTypeCode.VIEW.type) {
 
     constructor(
         elements: List<PdfComponent>,
@@ -49,7 +50,7 @@ data class PdfView private constructor(
         /** Try render elements **/
         var hasJumpPage = false
         elements.forEach {
-            if (hasJumpPage || it.type == Type.PAGE_BREAK) {
+            if (hasJumpPage || it.type.equals(ComponentTypeCode.PAGE_BREAK)) {
                 overdrawElements.add(it)
                 hasJumpPage = true
             } else {
@@ -71,7 +72,7 @@ data class PdfView private constructor(
         var previousX = 0f
         var maxLineHeight = 0f
         val calcOverdrawElements = overdrawElements.mapIndexedNotNull { index, element ->
-            if (index == 0 && element.type == Type.PAGE_BREAK) {
+            if (index == 0 && element.type.equals(ComponentTypeCode.PAGE_BREAK)) {
                 return@mapIndexedNotNull null
             }
             val result: PdfComponent = element.copyAbs(Position(element.position.x, cursorY), isBuilt = true)

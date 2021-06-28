@@ -15,12 +15,15 @@ data class Position(
 ) {
     init {
         if (property == PosProperty.RELATIVE && ( (x.smaller(0f) || y.smaller(0f)) || (x.bigger(100f) || y.bigger(100f)))) {
-            throw IllegalArgumentException("[Position] maximum value is 100 for Relative position")
+            throw IllegalArgumentException("[Position] Relative position must be between 0 <=> 100")
         }
     }
 
     companion object {
         val ORIGIN = Position()
+
+        fun fixed(x: Float, y: Float) = Position(x, y, PosProperty.FIXED)
+        fun relative(x: Float, y: Float) = Position(x, y, PosProperty.RELATIVE)
     }
 }
 

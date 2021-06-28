@@ -1,6 +1,6 @@
 package com.andres_k.lib.library.utils.data
 
-import com.andres_k.lib.library.core.component.PdfComponent
+import com.andres_k.lib.library.core.component.ComponentType
 
 /**
  * Created on 2020/12/11.
@@ -20,7 +20,9 @@ data class PdfDrawnElement(
     val y: Float,
     val xAbs: Float,
     val yAbs: Float,
-    val type: PdfComponent.Type,
+    val width: Float,
+    val height: Float,
+    val type: ComponentType,
     val identifier: String?,
     val text: String?
 )

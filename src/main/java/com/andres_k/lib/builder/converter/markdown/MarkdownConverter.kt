@@ -4,6 +4,7 @@ import com.andres_k.lib.builder.converter.PdfConverterConfig
 import com.andres_k.lib.builder.converter.markdown.action.*
 import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterConfig
 import com.andres_k.lib.builder.converter.markdown.context.MarkdownConverterContext
+import com.andres_k.lib.library.core.component.ComponentTypeCode
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.component.container.PdfCol
 import com.andres_k.lib.library.core.component.container.PdfRow
@@ -117,7 +118,7 @@ object MarkdownConverter {
                 content == null -> {
                     null
                 }
-                content.type == PdfComponent.Type.PAGE_BREAK -> content
+                content.type.equals(ComponentTypeCode.PAGE_BREAK) -> content
                 else -> {
                     PdfRow(
                         elements = listOf(

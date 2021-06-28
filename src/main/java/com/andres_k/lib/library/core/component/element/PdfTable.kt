@@ -1,5 +1,6 @@
 package com.andres_k.lib.library.core.component.element
 
+import com.andres_k.lib.library.core.component.ComponentTypeCode
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.component.container.PdfCol
 import com.andres_k.lib.library.core.property.*
@@ -31,7 +32,7 @@ data class PdfTable private constructor(
     override val background: Background,
     override val borders: Borders,
     override val isBuilt: Boolean,
-) : PdfComponent(identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.TABLE) {
+) : PdfComponent(identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, ComponentTypeCode.TABLE.type) {
 
     constructor(
         header: List<PdfCol>,
@@ -84,6 +85,8 @@ data class PdfTable private constructor(
             y = body.y,
             xAbs = body.x - padding.left,
             yAbs = body.y - padding.top,
+            width = body.width,
+            height = body.height,
             type = type,
             identifier = identifier,
             text = null

@@ -1,5 +1,6 @@
 package com.andres_k.lib.library.core.component.container
 
+import com.andres_k.lib.library.core.component.ComponentTypeCode
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.*
@@ -28,7 +29,7 @@ data class PdfList private constructor(
     override val background: Background,
     override val borders: Borders,
     override val isBuilt: Boolean
-) : PdfContainer(elements, splitOnOverdraw, identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, Type.LIST) {
+) : PdfContainer(elements, splitOnOverdraw, identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, ComponentTypeCode.LIST.type) {
 
     constructor(
         elements: List<PdfComponent>,

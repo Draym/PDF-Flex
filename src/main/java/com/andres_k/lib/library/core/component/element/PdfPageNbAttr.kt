@@ -1,5 +1,6 @@
 package com.andres_k.lib.library.core.component.element
 
+import com.andres_k.lib.library.core.component.ComponentTypeCode
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.DrawUtils
@@ -31,7 +32,7 @@ data class PdfPageNbAttr private constructor(
     override val background: Background,
     override val borders: Borders,
     override val isBuilt: Boolean
-) : PdfComponent(identifier, position, Size(), bodyAlign, padding, margin, color, background, borders, isBuilt, Type.PAGE_NB) {
+) : PdfComponent(identifier, position, Size(), bodyAlign, padding, margin, color, background, borders, isBuilt, ComponentTypeCode.PAGE_NB.type) {
 
     constructor(
         numberType: NbType,
@@ -69,6 +70,8 @@ data class PdfPageNbAttr private constructor(
             y = body.y,
             xAbs = body.x - padding.left,
             yAbs = body.y - padding.top,
+            width = body.width,
+            height = body.height,
             type = type,
             identifier = identifier,
             text = text

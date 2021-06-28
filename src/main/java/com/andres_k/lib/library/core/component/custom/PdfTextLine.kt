@@ -4,6 +4,7 @@ import com.andres_k.lib.library.core.component.element.PdfText
 import com.andres_k.lib.library.core.property.BodyAlign
 import com.andres_k.lib.library.core.property.Box2d
 import com.andres_k.lib.library.core.property.Spacing
+import com.andres_k.lib.library.utils.FontCode
 import com.andres_k.lib.library.utils.bigger
 import com.andres_k.lib.library.utils.config.PdfContext
 
@@ -26,10 +27,12 @@ data class PdfTextLine private constructor(
 
     constructor(
         text: String,
+        textFont: FontCode? = null,
+        textFontSize: Float? = null,
         forceInterLine: Boolean = false,
         interLine: Float? = null,
         bodyAlign: BodyAlign? = null
-    ) : this(PdfText(text = text, bodyAlign = bodyAlign), forceInterLine, interLine)
+    ) : this(PdfText(text = text, bodyAlign = bodyAlign, font = textFont, fontSize = textFontSize), forceInterLine, interLine)
 
 
     fun getTextWidth(context: PdfContext): Float {

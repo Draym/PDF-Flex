@@ -5,11 +5,13 @@ import com.andres_k.lib.builder.template.PdfBaseTemplate
 import com.andres_k.lib.library.core.component.custom.PdfFooter
 import com.andres_k.lib.library.core.component.custom.PdfHeader
 import com.andres_k.lib.library.core.property.Spacing
-import com.andres_k.lib.library.holder.PdfPage
+import com.andres_k.lib.library.core.page.PdfPage
 import com.andres_k.lib.library.utils.BaseFont
-import com.andres_k.lib.library.utils.EFont
+import com.andres_k.lib.library.utils.FontCode
+import com.andres_k.lib.library.utils.config.PdfDebugContext
 import com.andres_k.lib.library.utils.config.PdfProperties
 import org.apache.fontbox.ttf.TrueTypeFont
+import org.apache.pdfbox.pdmodel.font.PDFont
 import org.apache.pdfbox.pdmodel.font.PDType1Font
 
 /**
@@ -34,8 +36,16 @@ open class MarkdownToPDF(
     private val paddingX: Float = paddingX ?: 20f
     private val paddingY: Float = paddingY ?: 10f
 
-    override fun getFontToLoad(): Map<EFont, TrueTypeFont> {
+    override fun includeCustomFonts(): Map<FontCode, TrueTypeFont> {
         return emptyMap()
+    }
+
+    override fun includeStandardFonts(): Map<FontCode, PDFont> {
+        return mapOf(
+            BaseFont.DEFAULT.code to PDType1Font.TIMES_ROMAN,
+            BaseFont.BOLD.code to PDType1Font.TIMES_BOLD,
+            BaseFont.ITALIC.code to PDType1Font.TIMES_ITALIC
+        )
     }
 
     override fun createHeader(): PdfHeader? {
@@ -73,12 +83,11 @@ open class MarkdownToPDF(
 
     override fun getPdfDefaultProperties(): PdfProperties {
         return PdfProperties(
-            debugOn = debug,
-            availableFont = mapOf(
-                BaseFont.DEFAULT.code to PDType1Font.TIMES_ROMAN,
-                BaseFont.BOLD.code to PDType1Font.TIMES_BOLD,
-                BaseFont.ITALIC.code to PDType1Font.TIMES_ITALIC
-            )
+            debugOn = debug
         )
+    }
+
+    override fun getPdfDefaultDebugSettings(): PdfDebugContext {
+        return PdfDebugContext.DEFAULT
     }
 }

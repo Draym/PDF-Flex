@@ -1,5 +1,6 @@
 package com.andres_k.lib.library.core.component.element
 
+import com.andres_k.lib.library.core.component.ComponentTypeCode
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.FontCode
@@ -18,7 +19,7 @@ data class PdfPageBreak private constructor(
     override val identifier: String? = null,
     override val position: Position = Position.ORIGIN,
     override val isBuilt: Boolean,
-) : PdfComponent(identifier, position, Size.NONE, null, Spacing.NONE, Spacing.NONE, null, Background.NONE, Borders.NONE, false, Type.PAGE_BREAK) {
+) : PdfComponent(identifier, position, Size.NONE, null, Spacing.NONE, Spacing.NONE, null, Background.NONE, Borders.NONE, false, ComponentTypeCode.PAGE_BREAK.type) {
 
     constructor() : this(isBuilt = false)
 

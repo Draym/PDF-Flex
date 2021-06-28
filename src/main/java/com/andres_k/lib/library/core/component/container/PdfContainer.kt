@@ -1,5 +1,6 @@
 package com.andres_k.lib.library.core.component.container
 
+import com.andres_k.lib.library.core.component.ComponentType
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.component.element.PdfPageBreak
 import com.andres_k.lib.library.core.property.*
@@ -25,7 +26,7 @@ abstract class PdfContainer(
     background: Background,
     borders: Borders,
     isBuilt: Boolean,
-    type: Type,
+    type: ComponentType,
 ) : PdfComponent(identifier, position, size, bodyAlign, padding, margin, color, background, borders, isBuilt, type) {
 
     override fun verifyContent() {
@@ -44,15 +45,19 @@ abstract class PdfContainer(
 
     override fun drawContent(context: PdfContext, body: Box2d): List<PdfDrawnElement> {
         val drawElements = elements.map { it.draw(context = context, parent = body) }.flatten()
-        return listOf(PdfDrawnElement(
-            x = body.x,
-            y = body.y,
-            xAbs = body.x - padding.left,
-            yAbs = body.y - padding.top,
-            type = type,
-            identifier = identifier,
-            text = null
-        )) + drawElements
+        return listOf(
+            PdfDrawnElement(
+                x = body.x,
+                y = body.y,
+                xAbs = body.x - padding.left,
+                yAbs = body.y - padding.top,
+                width = body.width,
+                height = body.height,
+                type = type,
+                identifier = identifier,
+                text = null
+            )
+        ) + drawElements
     }
 
     override fun getChildren(): List<PdfComponent> {

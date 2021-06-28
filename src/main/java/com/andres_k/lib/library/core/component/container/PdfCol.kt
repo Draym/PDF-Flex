@@ -1,5 +1,6 @@
 package com.andres_k.lib.library.core.component.container
 
+import com.andres_k.lib.library.core.component.ComponentTypeCode
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.FontCode
@@ -23,7 +24,7 @@ data class PdfCol private constructor(
     override val background: Background,
     override val borders: Borders,
     override val isBuilt: Boolean,
-) : PdfContainer(elements, false, identifier, position, size, null, padding, Spacing.NONE, color, background, borders, isBuilt, Type.COL) {
+) : PdfContainer(elements, false, identifier, position, size, null, padding, Spacing.NONE, color, background, borders, isBuilt, ComponentTypeCode.COL.type) {
 
     fun content(): PdfComponent? = if (elements.isNotEmpty()) elements[0] else null
 

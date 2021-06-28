@@ -13,17 +13,28 @@ import java.awt.Color
  *
  * @author Kevin Andres
  */
-data class PdfProperties(
-        private val defaultFont: PDType1Font = PDType1Font.HELVETICA,
-        val defaultFontSize: FontSize = 11f,
-        val defaultInterline: Float = 2f,
-        val color: Color = Color.BLACK,
-        val drawOverflowX: Boolean = true,
-        val drawOverflowY: Boolean = true,
-        val createPageOnOverdraw: Boolean = false,
-        val debugOn: Boolean = false,
-        private val availableFont: Map<FontCode, PDFont> = emptyMap(),
+data class PdfProperties private constructor(
+    private val defaultFont: PDFont = PDType1Font.HELVETICA,
+    val defaultFontSize: FontSize = 11f,
+    val defaultInterline: Float = 2f,
+    val color: Color = Color.BLACK,
+    val drawOverflowX: Boolean = true,
+    val drawOverflowY: Boolean = true,
+    val createPageOnOverdraw: Boolean = false,
+    val debugOn: Boolean = false,
+    private val availableFont: Map<FontCode, PDFont> = emptyMap(),
 ) {
+
+    constructor(
+        defaultFont: PDFont = PDType1Font.HELVETICA,
+        defaultFontSize: FontSize = 11f,
+        defaultInterline: Float = 2f,
+        color: Color = Color.BLACK,
+        drawOverflowX: Boolean = true,
+        drawOverflowY: Boolean = true,
+        createPageOnOverdraw: Boolean = false,
+        debugOn: Boolean = false
+    ) : this(defaultFont, defaultFontSize, defaultInterline, color, drawOverflowX, drawOverflowY, createPageOnOverdraw, debugOn, emptyMap())
 
     fun getDefaultFont(): Font {
         val font = availableFont[BaseFont.DEFAULT.code] ?: defaultFont

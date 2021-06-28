@@ -36,12 +36,14 @@ class PdfParser(document: PDDocument) {
                     val result = sentence.text.indexOf(value)
 
                     if (result != -1 && result < sentence.characters.size) {
-                        val start = sentence.characters[result]
+                        val text = sentence.characters[result]
                         return ElementPositionResult(
                             page = page.index,
                             line = line.index,
-                            x = start.x,
-                            y = start.y,
+                            x = text.x,
+                            y = text.y,
+                            width = text.width,
+                            height = text.height,
                             pageWidth = page.pageWidth,
                             pageHeight = page.pageHeight
                         )

@@ -1,12 +1,13 @@
-package com.andres_k.lib.library.holder
+package com.andres_k.lib.library.core.page
 
+import com.andres_k.lib.library.core.component.ComponentTypeCode
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.component.container.PdfView
 import com.andres_k.lib.library.core.component.custom.PdfFooter
 import com.andres_k.lib.library.core.component.custom.PdfHeader
 import com.andres_k.lib.library.core.property.*
 import com.andres_k.lib.library.utils.config.PdfContext
-import com.andres_k.lib.library.utils.config.PdfContextDebug
+import com.andres_k.lib.library.utils.config.PdfDebugContext
 import com.andres_k.lib.library.utils.config.PdfPageProperties
 import com.andres_k.lib.library.utils.config.PdfProperties
 import com.andres_k.lib.library.utils.data.PdfDrawnElement
@@ -57,7 +58,7 @@ data class PdfPage private constructor(
     fun build(
         pageProperties: PdfPageProperties,
         properties: PdfProperties,
-        debug: PdfContextDebug,
+        debug: PdfDebugContext,
         defaultHeader: PdfHeader?,
         defaultFooter: PdfFooter?,
     ): PdfPage {
@@ -69,13 +70,13 @@ data class PdfPage private constructor(
 
         /** Build Header & Footer **/
         val contextPage = PdfContext(properties, null, pageProperties, pageBody, debug)
-        val calculatedHeader = header?.build(contextPage, Box2dRequest.ORIGIN, BoxSize(pageBody.width, pageBody.height, PdfComponent.Type.PAGE))
-        val calculatedFooter = footer?.build(contextPage, Box2dRequest.ORIGIN, BoxSize(pageBody.width, pageBody.height, PdfComponent.Type.PAGE))
+        val calculatedHeader = header?.build(contextPage, Box2dRequest.ORIGIN, BoxSize(pageBody.width, pageBody.height, ComponentTypeCode.PAGE.type))
+        val calculatedFooter = footer?.build(contextPage, Box2dRequest.ORIGIN, BoxSize(pageBody.width, pageBody.height, ComponentTypeCode.PAGE.type))
 
         /** Build Content **/
         val viewBody = getContentBody(calculatedHeader?.content, calculatedFooter?.content)
         val contextCalculation = PdfContext(properties, null, pageProperties, viewBody, debug)
-        val calculatedView = view.build(contextCalculation, Box2dRequest.ORIGIN, BoxSize(viewBody.width, viewBody.height, PdfComponent.Type.PAGE)) as PdfView
+        val calculatedView = view.build(contextCalculation, Box2dRequest.ORIGIN, BoxSize(viewBody.width, viewBody.height, ComponentTypeCode.PAGE.type)) as PdfView
 
         /** return calculated PdfPage **/
         return this.copy(view = calculatedView, header = calculatedHeader, footer = calculatedFooter)
@@ -84,7 +85,7 @@ data class PdfPage private constructor(
     fun preRender(
         pageProperties: PdfPageProperties,
         properties: PdfProperties,
-        debug: PdfContextDebug,
+        debug: PdfDebugContext,
     ): Pair<PdfPage, PdfView?> {
         /** Create Contexts **/
         val viewBody = getContentBody(header?.content, footer?.content)
@@ -109,7 +110,7 @@ data class PdfPage private constructor(
         contentStream: PDPageContentStream,
         pageProperties: PdfPageProperties,
         properties: PdfProperties,
-        debug: PdfContextDebug,
+        debug: PdfDebugContext,
     ): List<PdfDrawnElement> {
         //println("draw page: origin(${page.cropBox.lowerLeftX + padding.left}, ${page.cropBox.upperRightY - padding.top})")
         /** Define final header & Footer **/

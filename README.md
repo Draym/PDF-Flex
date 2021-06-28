@@ -1,11 +1,11 @@
 PDF-Flex
 =======
 
-PDF-Flex is a library that can be used to easily compose responsive components within a PDF. It uses [Apache pdfbox](https://github.com/apache/pdfbox) as it's root while abstracting
-the api into a harmonised set of tools and pre-defined components.
+PDF-Flex is a library that can be used to easily compose responsive components within a PDF. It uses [Apache pdfbox](https://github.com/apache/pdfbox) as it's root while
+abstracting the api into a harmonised set of tools and pre-defined components.
 
-PDF-Flex is designed within a responsive system which allows the components within the PDF to adjust against each-others. Thanks to it, it's now easier to create complex design with
-generic and adjustable, both in width & height, component within a PDF.
+PDF-Flex is designed within a responsive system which allows the components within the PDF to adjust against each-others. Thanks to it, it's now easier to create complex design
+with generic and adjustable, both in width & height, component within a PDF.
 
 It allows easier usage of Paragraph, Table, Rows and support multi-page implementation.
 
@@ -75,15 +75,27 @@ class MyTemplate() : PdfBaseTemplate() {
 
 #### Define the font you wish to use
 
-- A fond is defined by a code **BaseFont** which support default, bold and italic, you will then use this code when creating a new component. This will allow the font to be saved
-  only once in the builder and be use only when the builder will write out the PDF.
-- PDF-Flex use TrueTypeFont type, you can use the utility tools [FontUtils](https://github.com/Draym/pdf-flex/wiki/Tools#fontutil) to load your own font
+- A fond is associated to a code, you will then use this code when creating a new component. This will allow the font to be saved only once in the builder and be use only when the
+  builder will write out the PDF.
+- For convenience, we usually use **BaseFont** which define default, bold and italic code. Still you can define and use as many Fonts as you wish within your document.
+
+- There are two ways to define fonts, by uploading custom one, or use the ones provided by apache/pdfbox
+    - custom Fonts use TrueTypeFont type, you can use the utility tools [FontUtils](https://github.com/Draym/pdf-flex/wiki/Tools#fontutil) to load your own font
+    - apache/pdfbox define a set of [standard font](https://pdfbox.apache.org/1.8/cookbook/workingwithfonts.html)
 
 ````kotlin
-override fun getFontToLoad(): Map<EFont, TrueTypeFont> {
+override fun includeCustomFonts(): Map<EFont, TrueTypeFont> {
     return mapOf(
         BaseFont.DEFAULT to FontUtils.loadTTCFont(YAHEI_CLASSIC.fontPath, YAHEI_CLASSIC.fontName),
         BaseFont.BOLD to FontUtils.loadTTCFont(YAHEI_BOLD.fontPath, YAHEI_BOLD.fontName)
+    )
+}
+````
+
+````kotlin
+override fun includeStandardFonts(): Map<EFont, PDFont> {
+    return mapOf(
+        BaseFont.ITALIC to PDType1Font.TIMES_ITALIC
     )
 }
 ````
@@ -126,39 +138,55 @@ override fun createPages(): List<PdfPage> {
     val rtTxt = FConf(font = fontB, bodyAlign = BodyAlign.CENTER_CENTER, color = Color(90, 43, 129))
 
     // let's define a title
-    val title = PdfText("Hello world", fontSize = 17f).conf(rtTxt)
+    val title = PdfText("Hello world!", fontSize = 17f).conf(rtTxt)
 
     // add the title into the first row
     val rowTitle = PdfRow(
-        elements = listOf(myTitle),
+        elements = listOf(title),
         margin = Spacing(top = 20f)
     )
 
     /** Paragraph **/
-    // now let's create a paragraph to hold some generic text
-    val messages = listOf("This library is awesome", "let's try every available components")
-    val paragraphe = PdfParagraph(
+    // now let's create some paragraph, the lines will be adjusted during the build to fit it's parent width, if it overdraw, a new line will be created
+
+    // the default impl does not automatically handle the '\n' character, you have to split the lines ahead
+    val messages = listOf("This library is awesome.", "Let's try every available components.\nEnd of text.")
+    val paragraph1 = PdfParagraph(
         lines = messages
             .map { text ->
-                text.lines().map { PdfTextLine(PdfText(text = it, bodyAlign = BodyAlign.LEFT).conf(rtTxt)) }
+                text.lines().map { PdfTextLine(PdfText(text = it, bodyAlign = BodyAlign.LEFT, font = BaseFont.DEFAULT.code, color = Color.BLACK)) }
             }.flatten(),
         bodyAlign = BodyAlign.TOP_LEFT
     )
 
-    // add the paragraph into the second row
+    // you can also create a paragraph from a single String, it will handle the '\n' but offer less option on the TextComponent level
+    val flatMessage = "This library is awesome.\n Let's try every available components.\nEnd of text."
+    val paragraph2 = PdfParagraph(
+        text = flatMessage,
+        textAlign = BodyAlign.LEFT,
+        textFont = BaseFont.DEFAULT.code,
+        color = Color.BLACK,
+        bodyAlign = BodyAlign.TOP_LEFT
+    )
+
+    // If you put both paragraph into the row, and do not set paragraph width, by default it will take 100% of parent /!\
+    // In order to put multiple expandable components, such as paragraph, into a row, we should use columns
     val rowParagraph = PdfRow(
-        elements = listOf(myTitle),
+        elements = listOf(
+          PdfCol(paragraph1, maxWidth = SizeAttr.percent(50f)),
+          PdfCol(paragraph2, maxWidth = SizeAttr.percent(50f))
+        ),
         margin = Spacing(top = 20f)
     )
 
     /** Pages **/
-    // create a page with all my rows
+    // create a page with all the rows
     val page1 = PdfPage(
-        elements = listOfNotNull(
+        elements = listOf(
             rowTitle,
             rowParagraph
         ),
-        padding = Spacing(10, 10, 10, 10)
+        padding = Spacing(10f, 10f, 10f, 10f)
     )
     return listOf(page1)
 }
@@ -173,7 +201,7 @@ override fun getPdfDefaultProperties(): PdfProperties {
     return PdfProperties(
         defaultFontSize = 11f,
         defaultInterline = 2f, // the size between each lines
-        debugOn = true, // if true it will draw additional lines such as container borders to help you debug your design, you can customize 
+        debugOn = true, // if true it will draw additional lines such as container borders to help you debug your design, you can customize it using PdfContextDebug
         color = Color.BLACK, // default component colors (font, border..)
         drawOverflowX = true, // do not cut the components if they happens to draw on each other
         drawOverflowY = true, // do not cut the components if they happens to draw on each other
@@ -218,11 +246,10 @@ myTemplate.use { builder ->
         val pdfAsBytes = output.get()
 
         // return the generated result data
-        return PDFGeneratedWrapper(
-            bytes = pdfAsBytes,
+        PDFGeneratedWrapper(
+            pdf = pdfAsBytes,
             explorer = explorer
         )
     }
-
 }
 ```
