@@ -1,11 +1,10 @@
 PDF-Flex
 =======
 
-PDF-Flex is a library that can be used to easily compose responsive components within a PDF. It uses [Apache pdfbox](https://github.com/apache/pdfbox) as it's root while
+PDF-Flex is a library that can be used to easily compose responsive components within a PDF. It uses [Apache pdfbox](https://github.com/apache/pdfbox) as its root while
 abstracting the api into a harmonised set of tools and pre-defined components.
 
-PDF-Flex is designed within a responsive system which allows the components within the PDF to adjust against each-others. Thanks to it, it's now easier to create complex design
-with generic and adjustable, both in width & height, component within a PDF.
+PDF-Flex is designed within a responsive system which allows the components within the PDF to adjust against each-others. Thanks to it, it's now easier to create complex design with generic and adjustable, both in width & height, component within a PDF.
 
 It allows easier usage of Paragraph, Table, Rows and support multi-page implementation.
 
@@ -147,7 +146,7 @@ override fun createPages(): List<PdfPage> {
     )
 
     /** Paragraph **/
-    // now let's create some paragraph, the lines will be adjusted during the build to fit it's parent width, if it overdraw, a new line will be created
+    // now let's create some paragraph, the lines will be adjusted during the build to fit its parent width, if it overdraw, a new line will be created
 
     // the default impl does not automatically handle the '\n' character, you have to split the lines ahead
     val messages = listOf("This library is awesome.", "Let's try every available components.\nEnd of text.")
