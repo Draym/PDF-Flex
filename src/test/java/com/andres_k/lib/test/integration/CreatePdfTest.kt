@@ -1,5 +1,6 @@
 package com.andres_k.lib.test.integration
 
+import com.andres_k.lib.extension.template.BaseTestTemplate
 import com.andres_k.lib.library.core.component.PdfComponent
 import com.andres_k.lib.library.core.component.container.PdfCol
 import com.andres_k.lib.library.core.component.container.PdfRow
@@ -12,28 +13,45 @@ import com.andres_k.lib.library.core.property.Spacing
 import com.andres_k.lib.library.factory.FConf
 import com.andres_k.lib.library.factory.conf
 import com.andres_k.lib.library.output.OutputBuilder
-import com.andres_k.lib.library.utils.BaseFont
-import com.andres_k.lib.extension.template.BaseTestTemplate
 import com.andres_k.lib.library.output.PdfToFile
+import com.andres_k.lib.library.utils.BaseFont
+import com.andres_k.lib.parser.PdfParser
 import com.andres_k.lib.test.PdfFlexBase
 import com.andres_k.lib.wrapper.PDFGeneratedWrapper
+import org.apache.pdfbox.pdmodel.PDDocument
 import org.junit.jupiter.api.AfterEach
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.io.TempDir
 import java.awt.Color
 import java.io.File
+import java.nio.file.InvalidPathException
+import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+
 
 /**
  * Created on 2021/06/28.
  *
  * @author Kevin Andres
  */
-internal class CreatePdfTest: PdfFlexBase() {
+internal class CreatePdfTest : PdfFlexBase() {
 
-    val fileOutput = PdfToFile(getPdfTestPath("CreatePdfTest.pdf"))
+    @TempDir
+    lateinit var tempDir: Path
+
+    private lateinit var createPdfTestFile: Path
 
     @BeforeEach
     fun setUp() {
+        try {
+            createPdfTestFile = tempDir.resolve("CreatePdfTest.pdf")
+        } catch (ipe: InvalidPathException) {
+            System.err.println("[CreatePdfTest] error creating temporary test file in " + this.javaClass.simpleName)
+        }
     }
 
     @AfterEach
@@ -67,12 +85,29 @@ internal class CreatePdfTest: PdfFlexBase() {
     fun createPDFIntoFile() {
         val components = createComponents()
         val template = BaseTestTemplate(components)
+        val fileOutput = PdfToFile(createPdfTestFile.toFile())
 
-        template.use { builder ->
+        val explorer = template.use { builder ->
             fileOutput.use { output ->
                 // build the PDF in memory and save it to a file
                 builder.build(output)
             }
+        }
+
+
+        assertTrue(createPdfTestFile.exists());
+
+        PDDocument.load(createPdfTestFile.toFile()).use { pdf ->
+            val parser = PdfParser(pdf)
+
+            val drawnTitle = explorer.searchText("Hello world").firstOrNull()
+            assertNotNull(drawnTitle)
+
+            val resultTitle = parser.search("Hello world")
+            println("result title: $resultTitle")
+            assertNotNull(resultTitle)
+            assertEquals((resultTitle.pageWidth / 2) - (drawnTitle.width / 2), resultTitle.getPositionFromTop().x)
+            assertEquals(Color(90, 43, 129), resultTitle.color)
         }
     }
 
@@ -88,7 +123,7 @@ internal class CreatePdfTest: PdfFlexBase() {
         )
 
         /** Paragraph **/
-        val messages = listOf("\"Test Line1.", "\"Test Line2.\n\"Test Line3.")
+        val messages = listOf("Test Line1.", "Test Line2.\nTest Line3.")
         val paragraph1 = PdfParagraph(
             lines = messages
                 .map { text ->
