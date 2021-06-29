@@ -1,4 +1,4 @@
-PDF-Flex
+PDF-Flex [![Build Status](https://travis-ci.com/Draym/PDF-Flex.svg?branch=main)](https://travis-ci.com/Draym/PDF-Flex)
 =======
 
 PDF-Flex is a library that can be used to easily compose responsive components within a PDF. It uses [Apache pdfbox](https://github.com/apache/pdfbox) as its root while

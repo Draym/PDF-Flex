@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
 
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <kotlin.version>1.5.0</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <changelist>-SNAPSHOT</changelist>
@@ -118,4 +118,12 @@
             <url>https://dl.bintray.com/jetbrains/markdown</url>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub Packages</name>
+            <url>https://maven.pkg.github.com/Draym/PDF-Flex</url>
+        </repository>
+    </distributionManagement>
 </project>
