@@ -67,7 +67,8 @@ data class PdfText private constructor(
             height = body.height,
             type = type,
             identifier = identifier,
-            text = text
+            text = text,
+            color = color
         ))
     }
 

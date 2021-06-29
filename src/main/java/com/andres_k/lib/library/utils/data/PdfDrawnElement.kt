@@ -1,6 +1,7 @@
 package com.andres_k.lib.library.utils.data
 
 import com.andres_k.lib.library.core.component.ComponentType
+import java.awt.Color
 
 /**
  * Created on 2020/12/11.
@@ -24,5 +25,6 @@ data class PdfDrawnElement(
     val height: Float,
     val type: ComponentType,
     val identifier: String?,
-    val text: String?
+    val text: String?,
+    val color: Color?
 )

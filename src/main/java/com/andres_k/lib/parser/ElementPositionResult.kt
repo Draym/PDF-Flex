@@ -1,5 +1,7 @@
 package com.andres_k.lib.parser
 
+import java.awt.Color
+
 /**
  * Created on 2020/12/10.
  *
@@ -17,6 +19,7 @@ data class ElementPositionResult(
     private val y: Float,
     val width: Float,
     val height: Float,
+    val color: Color?,
     val pageWidth: Float,
     val pageHeight: Float,
     val identifier: String? = null

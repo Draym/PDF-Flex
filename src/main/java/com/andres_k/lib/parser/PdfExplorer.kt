@@ -26,6 +26,7 @@ data class PdfExplorer(val drawnPages: List<PdfDrawnPage>) {
                         y = page.height - (if (absPosition) component.yAbs else component.y),
                         width = component.width,
                         height = component.height,
+                        color = component.color,
                         pageWidth = page.width,
                         pageHeight = page.height,
                         identifier = component.identifier
@@ -46,6 +47,7 @@ data class PdfExplorer(val drawnPages: List<PdfDrawnPage>) {
                         y = page.height - (if (absPosition) component.yAbs else component.y),
                         width = component.width,
                         height = component.height,
+                        color = component.color,
                         pageWidth = page.width,
                         pageHeight = page.height,
                         identifier = component.identifier
@@ -66,6 +68,7 @@ data class PdfExplorer(val drawnPages: List<PdfDrawnPage>) {
                         y = page.height - (if (absPosition) component.yAbs else component.y),
                         width = component.width,
                         height = component.height,
+                        color = component.color,
                         pageWidth = page.width,
                         pageHeight = page.height,
                         identifier = component.identifier

@@ -52,7 +52,8 @@ data class PdfShape(
             height = body.height,
             type = type,
             identifier = identifier,
-            text = null
+            text = null,
+            color = color
         ))
     }
 

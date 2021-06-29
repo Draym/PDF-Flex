@@ -68,7 +68,8 @@ data class PdfImage private constructor(
             height = body.height,
             type = type,
             identifier = identifier,
-            text = null
+            text = null,
+            color = color
         ))
     }
 
