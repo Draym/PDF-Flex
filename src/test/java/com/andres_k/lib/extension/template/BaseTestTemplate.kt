@@ -49,7 +49,7 @@ class BaseTestTemplate(private val components: List<PdfComponent>) : PdfBaseTemp
     }
 
     override fun getPdfDefaultProperties(): PdfProperties {
-        return PdfProperties()
+        return PdfProperties(debugOn = true)
     }
 
     override fun getPdfDefaultDebugSettings(): PdfDebugContext {

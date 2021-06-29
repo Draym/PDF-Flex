@@ -14,12 +14,14 @@ import com.andres_k.lib.library.factory.conf
 import com.andres_k.lib.library.output.OutputBuilder
 import com.andres_k.lib.library.utils.BaseFont
 import com.andres_k.lib.extension.template.BaseTestTemplate
+import com.andres_k.lib.library.output.PdfToFile
 import com.andres_k.lib.test.PdfFlexBase
 import com.andres_k.lib.wrapper.PDFGeneratedWrapper
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.awt.Color
+import java.io.File
 
 /**
  * Created on 2021/06/28.
@@ -27,6 +29,8 @@ import java.awt.Color
  * @author Kevin Andres
  */
 internal class CreatePdfTest: PdfFlexBase() {
+
+    val fileOutput = PdfToFile(getPdfTestPath("CreatePdfTest.pdf"))
 
     @BeforeEach
     fun setUp() {
@@ -37,14 +41,12 @@ internal class CreatePdfTest: PdfFlexBase() {
     }
 
     @Test
-    fun createPDF() {
+    fun createPDFInMemory() {
         val components = createComponents()
         val template = BaseTestTemplate(components)
 
         val pdf = template.use { builder ->
-
             OutputBuilder.asByteArray().use { output ->
-
                 // build the PDF in memory
                 // explorer will contains information on what has been actually created
                 val explorer = builder.build(output)
@@ -57,6 +59,19 @@ internal class CreatePdfTest: PdfFlexBase() {
                     pdf = pdfAsBytes,
                     explorer = explorer
                 )
+            }
+        }
+    }
+
+    @Test
+    fun createPDFIntoFile() {
+        val components = createComponents()
+        val template = BaseTestTemplate(components)
+
+        template.use { builder ->
+            fileOutput.use { output ->
+                // build the PDF in memory and save it to a file
+                builder.build(output)
             }
         }
     }

@@ -19,7 +19,6 @@ class PdfToFile(private val output: File): OutputBuilder {
         document.save(output)
     }
 
-
     /**
      * Because we use the built-in file output of PDDocument, we dont have to close it there.
      * It will be closed with PDDocument in PdfDocument.close()
