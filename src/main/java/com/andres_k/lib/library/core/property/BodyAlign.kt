@@ -43,7 +43,7 @@ enum class AlignHorizontal {
     CENTER {
         override fun transform(child: Box2d, margin: Spacing, parent: Box2d): Float {
             val t = (parent.width - (child.width + margin.spacingX())) / 2
-            return if (t.bigger(0f)) t else margin.left
+            return if (t.bigger(0f)) t + margin.left else margin.left
         }
     },
     RIGHT {
@@ -70,7 +70,7 @@ enum class AlignVertical {
     CENTER {
         override fun transform(child: Box2d, margin: Spacing, parent: Box2d): Float {
             val t = (parent.height - (child.height + margin.spacingY())) / 2
-            return if (t.bigger(0f)) t else margin.top
+            return if (t.bigger(0f)) t + margin.top else margin.top
         }
     },
     BOTTOM {
