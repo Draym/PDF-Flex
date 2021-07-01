@@ -24,6 +24,7 @@ object DrawUtils {
         weight: Float = 1f
     ) {
         if (points.isNotEmpty()) {
+            stream.setLineWidth(weight)
             setColor(stream, borderColor = color, fillColor = fillColor)
             stream.moveTo(points[0].x.toFloat(), points[0].y.toFloat())
             points.map { point ->
