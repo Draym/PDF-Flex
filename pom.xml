@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.andres_k.lib</groupId>
     <artifactId>pdf-flex</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
     <name>pdf-flex</name>
     <description>PDF Builder for Kotlin</description>
     <packaging>jar</packaging>
@@ -17,7 +17,7 @@
         <changelist>-SNAPSHOT</changelist>
 
         <apache-pdfbox.version>2.0.20</apache-pdfbox.version>
-        <jetbrains-markdown.version>0.2.0.pre-55</jetbrains-markdown.version>
+        <jetbrains-markdown.version>0.2.4</jetbrains-markdown.version>
         <junit-jupiter.version>5.7.2</junit-jupiter.version>
     </properties>
 
@@ -58,14 +58,9 @@
         </dependency>
         <dependency>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.22.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-jar-plugin</artifactId>
             <version>3.2.0</version>
+            <scope>test</scope>
         </dependency>
 
     </dependencies>
@@ -102,28 +97,17 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <jvmTarget>1.8</jvmTarget>
+                    <jvmTarget>11</jvmTarget>
                 </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
             </plugin>
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>jetbrains-markdown</id>
-            <url>https://dl.bintray.com/jetbrains/markdown</url>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <repository>
-            <id>github</id>
-            <name>GitHub Packages</name>
-            <url>https://maven.pkg.github.com/Draym/PDF-Flex</url>
-        </repository>
-    </distributionManagement>
+<!--    <distributionManagement>-->
+<!--        <repository>-->
+<!--            <id>github</id>-->
+<!--            <name>GitHub Packages</name>-->
+<!--            <url>https://maven.pkg.github.com/Draym/PDF-Flex</url>-->
+<!--        </repository>-->
+<!--    </distributionManagement>-->
 </project>
