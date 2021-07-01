@@ -25,7 +25,7 @@ object ConvertTable : MarkdownAction {
         val nbCols = row.children.count { it.type == GFMTokenTypes.CELL }
         val colSize = 100f / nbCols
 
-        return row.children.mapIndexedNotNull { index, child ->
+        return row.children.mapNotNull { child ->
             if (child.type == GFMTokenTypes.CELL) {
                 val text = PdfParagraph(listOf(PdfTextLine(ConvertText.extractText(child, markdown, config))))
                 PdfCol(content = text, padding = padding, maxWidth = SizeAttr.percent(colSize))
