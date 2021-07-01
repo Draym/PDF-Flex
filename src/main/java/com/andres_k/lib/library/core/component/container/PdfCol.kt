@@ -40,10 +40,12 @@ data class PdfCol private constructor(
 
     // empty col
     constructor(
+        maxWidth: SizeAttr? = null,
+        identifier: String? = null,
         color: Color? = null,
         background: Background = Background.NONE,
         borders: Borders = Borders.NONE,
-    ) : this(listOf(), null, Position.ORIGIN, Size(null, SizeAttr.percent(100f)), Spacing.NONE, color, background, borders, false)
+    ) : this(listOf(), identifier, Position.ORIGIN, Size(maxWidth, SizeAttr.percent(100f)), Spacing.NONE, color, background, borders, false)
 
     override fun preRenderContent(context: PdfContext, body: Box2d): PdfOverdrawResult {
         val result = content()?.preRender(context = context, parent = body)
