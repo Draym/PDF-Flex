@@ -44,7 +44,7 @@ abstract class PdfContainer(
     }
 
     override fun drawContent(context: PdfContext, body: Box2d): List<PdfDrawnElement> {
-        val drawElements = elements.map { it.draw(context = context, parent = body) }.flatten()
+        val drawnElements = elements.map { it.draw(context = context, parent = body) }.flatten()
         return listOf(
             PdfDrawnElement(
                 x = body.x,
@@ -58,7 +58,7 @@ abstract class PdfContainer(
                 text = null,
                 color = color
             )
-        ) + drawElements
+        ) + drawnElements
     }
 
     override fun getChildren(): List<PdfComponent> {

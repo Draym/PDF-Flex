@@ -44,18 +44,18 @@ abstract class PdfComponent(
     open fun verifyContent() {}
 
     fun preRender(context: PdfContext, parent: Box2d): PdfOverdrawResult {
-        return preRenderContent(context, getDrawableContent(parent))
+        return preRenderContent(context, getDrawableContainer(parent))
     }
 
     fun draw(context: PdfContext, parent: Box2d): List<PdfDrawnElement> {
-        val drawableContent = getDrawableContent(parent)
+        val body = getDrawableContainer(parent)
         drawBackground(context, parent)
         if (context.properties.debugOn) {
             drawMargin(context, parent)
             drawPadding(context, parent)
         }
         drawBorder(context, parent)
-        return drawContent(context, drawableContent)
+        return drawContent(context, body)
     }
 
     private fun drawBackground(context: PdfContext, parent: Box2d) {
@@ -242,7 +242,7 @@ abstract class PdfComponent(
         return alignedY(parent).toDrawY(parent.y)
     }
 
-    private fun getDrawableContent(parent: Box2d): Box2d {
+    private fun getDrawableContainer(parent: Box2d): Box2d {
         return Box2d(alignedX(parent) + padding.left + parent.x, parent.y - (alignedY(parent) + padding.top), contentWidth(), contentHeight())
     }
 

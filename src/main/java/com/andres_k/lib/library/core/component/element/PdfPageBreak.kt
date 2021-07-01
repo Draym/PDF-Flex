@@ -43,6 +43,7 @@ data class PdfPageBreak private constructor(
         return emptyList()
     }
 
+    @Suppress("UNCHECKED_CAST")
     override fun <T : PdfComponent> copyAbs(
         position: Position?,
         size: Size?,
