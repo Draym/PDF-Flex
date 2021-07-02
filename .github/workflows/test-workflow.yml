@@ -1,10 +1,8 @@
-name: Run Tests
+name: Tests
 
 on:
-  workflow_run:
-    workflows: [ "Java Build" ]
-    types:
-      - completed
+  repository_dispatch:
+    types: [ Build - success ]
 
 jobs:
   test:
@@ -17,4 +15,5 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
-      - run: mvn --batch-mode verify
+      - name: Run Tests
+        run: mvn --batch-mode verify

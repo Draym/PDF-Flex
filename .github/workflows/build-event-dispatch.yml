@@ -1,0 +1,15 @@
+name: Repository dispatch of Build
+on:
+  workflow_run:
+    workflows: [Build]
+    types: [completed]
+
+jobs:
+  workflow-dispatch:
+    name: repo dispatch event with conclusion
+    runs-on: ubuntu-latest
+    steps:
+      - name: repo dispatch
+        uses: tonyhallett/workflow-run-conclusion-dispatch-action@v1.0.0
+        with:
+          GITHUB_PAT: ${{ secrets.PAT }}
