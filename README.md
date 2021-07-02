@@ -1,4 +1,4 @@
-PDF-Flex [![Build & Tests](https://github.com/Draym/PDF-Flex/actions/workflows/ci-workflow.yml/badge.svg)](https://github.com/Draym/PDF-Flex/actions/workflows/ci-workflow.yml) [![GitHub](https://github.com/Draym/PDF-Flex/actions/workflows/deploy-github-workflow.yml/badge.svg)](https://github.com/Draym/PDF-Flex/actions/workflows/deploy-github-workflow.yml) [![MavenCentral](https://github.com/Draym/PDF-Flex/actions/workflows/deploy-maven-workflow.yml/badge.svg)](https://github.com/Draym/PDF-Flex/actions/workflows/deploy-maven-workflow.yml)
+PDF-Flex [![CI](https://github.com/Draym/PDF-Flex/actions/workflows/ci-workflow.yml/badge.svg)](https://github.com/Draym/PDF-Flex/actions/workflows/ci-workflow.yml) [![GitHubPackage](https://github.com/Draym/PDF-Flex/actions/workflows/deploy-github-workflow.yml/badge.svg)](https://github.com/Draym/PDF-Flex/actions/workflows/deploy-github-workflow.yml) [![MavenCentral](https://github.com/Draym/PDF-Flex/actions/workflows/deploy-maven-workflow.yml/badge.svg)](https://github.com/Draym/PDF-Flex/actions/workflows/deploy-maven-workflow.yml)
 =======
 
 PDF-Flex is a library that can be used to easily compose responsive components within a PDF. It uses [Apache pdfbox](https://github.com/apache/pdfbox) as its root while
@@ -32,15 +32,25 @@ It has been developed in an effort of creating a complete easy-to-use high-level
 
 # Maven
 
+### Maven Central
 TODO
 
 ```xml
-
 <dependency>
     <groupId></groupId>
     <artifactId></artifactId>
     <version>1.1.0</version>
 </dependency>
+```
+
+### Github Packages
+
+```xml
+    <dependency>
+        <groupId>com.andres_k.lib</groupId>
+        <artifactId>pdf-flex</artifactId>
+        <version>1.2.3</version>
+    </dependency>
 ```
 
 # Documentation
