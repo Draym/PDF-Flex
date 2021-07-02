@@ -1,4 +1,4 @@
-name: Build & Tests
+name: CI
 
 on: [push, pull_request]
 
@@ -20,5 +20,5 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven-
-      - name: Build with Maven
+      - name: Build & run Tests
         run: mvn --batch-mode --update-snapshots verify
