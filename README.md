@@ -32,15 +32,25 @@ It has been developed in an effort of creating a complete easy-to-use high-level
 
 # Maven
 
+## Maven Central
 TODO
 
 ```xml
-
 <dependency>
     <groupId></groupId>
     <artifactId></artifactId>
     <version>1.1.0</version>
 </dependency>
+```
+
+## Github Packages
+
+```xml
+    <dependency>
+        <groupId>com.andres_k.lib</groupId>
+        <artifactId>pdf-flex</artifactId>
+        <version>1.2.3</version>
+    </dependency>
 ```
 
 # Documentation
