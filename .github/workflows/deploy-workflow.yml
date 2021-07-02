@@ -1,8 +1,8 @@
-name: Deployment
+name: Deploy
 
 on:
   repository_dispatch:
-    types: [ Tests - success ]
+    types: [Tests - push - success]
     branches: [main]
 
 

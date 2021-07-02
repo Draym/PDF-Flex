@@ -6,7 +6,7 @@ on:
 
 jobs:
   workflow-dispatch:
-    name: repo dispatch event with conclusion
+    name: dispatch event with conclusion
     runs-on: ubuntu-latest
     steps:
       - name: repo dispatch
