@@ -32,7 +32,7 @@ It has been developed in an effort of creating a complete easy-to-use high-level
 
 # Maven
 
-## Maven Central
+### Maven Central
 TODO
 
 ```xml
@@ -43,7 +43,7 @@ TODO
 </dependency>
 ```
 
-## Github Packages
+### Github Packages
 
 ```xml
     <dependency>
