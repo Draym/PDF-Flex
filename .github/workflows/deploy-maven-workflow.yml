@@ -1,11 +1,11 @@
-name: MavenCentral
+name: maven-central
 
 on:
   workflow_run:
     workflows: [ CI ]
     types:
       - completed
-    branches: [ main ]
+    branches: [ publish ]
 
 jobs:
   publish:
