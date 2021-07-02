@@ -1,10 +1,11 @@
-name: Deploy
+name: Deploy MavenCentral
 
 on:
-  repository_dispatch:
-    types: [Tests - push - success]
-    branches: [main]
-
+  workflow_run:
+    workflows: [ "Build & Tests" ]
+    types:
+      - completed
+    branches: [ main ]
 
 jobs:
   publish:
@@ -14,7 +15,6 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v2
-
       - name: Set up Java for publishing to Maven Central Repository
         uses: actions/setup-java@v2
         with:
@@ -31,13 +31,3 @@ jobs:
           OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
           OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
           MAVEN_GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
-
-      - name: Set up Java for publishing to GitHub Packages
-        uses: actions/setup-java@v2
-        with:
-          java-version: '11'
-          distribution: 'adopt'
-      - name: Publish to GitHub Packages
-        run: mvn --batch-mode deploy -P github -Dmaven.test.skip=true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
