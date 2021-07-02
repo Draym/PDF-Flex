@@ -3,7 +3,8 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build:
+  build_test:
+    name: "Build & run Tests"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

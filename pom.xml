@@ -6,7 +6,7 @@
 
     <groupId>com.andres_k.lib</groupId>
     <artifactId>pdf-flex</artifactId>
-    <version>1.2.3</version>
+    <version>1.2.4</version>
 
     <name>pdf-flex</name>
     <description>PDF Builder for Kotlin</description>
