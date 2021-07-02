@@ -1,4 +1,4 @@
-name: Repository dispatch of Build
+name: Build completion events
 on:
   workflow_run:
     workflows: [Build]
@@ -12,4 +12,4 @@ jobs:
       - name: repo dispatch
         uses: tonyhallett/workflow-run-conclusion-dispatch-action@v1.0.0
         with:
-          GITHUB_PAT: ${{ secrets.PAT }}
+          GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
