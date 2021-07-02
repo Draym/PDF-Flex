@@ -1,4 +1,4 @@
-package com.andres_k.lib.test.unit.element.text
+package com.andres_k.lib.test.element.text
 
 import com.andres_k.lib.extension.builder.BuilderTestSupport
 import com.andres_k.lib.library.core.component.ComponentTypeCode

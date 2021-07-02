@@ -1,4 +1,4 @@
-package com.andres_k.lib.test.integration
+package com.andres_k.lib.test.document
 
 import com.andres_k.lib.extension.template.BaseTestTemplate
 import com.andres_k.lib.library.core.component.PdfComponent
@@ -25,7 +25,6 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.awt.Color
-import java.io.File
 import java.nio.file.InvalidPathException
 import java.nio.file.Path
 import kotlin.io.path.exists
