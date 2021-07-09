@@ -38,9 +38,9 @@ The library is available in both maven central and github-packages. Simply add t
 ### Maven Central
 
 ```xml
-
+<!-- not available yet -->
 <dependency>
-    <groupId>draym.github.io</groupId>
+    <groupId>?</groupId>
     <artifactId>pdf-flex</artifactId>
     <version>1.2.4</version>
 </dependency>
