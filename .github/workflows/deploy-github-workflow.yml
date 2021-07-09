@@ -21,6 +21,7 @@ jobs:
         with:
           java-version: '11'
           distribution: 'adopt'
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
       - name: Publish to GitHub Packages
         run: mvn --batch-mode deploy -P github -Dmaven.test.skip=true
         env:

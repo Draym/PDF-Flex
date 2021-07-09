@@ -15,7 +15,7 @@ jobs:
       contents: read
       packages: write
     environment:
-        name: OSSRH
+      name: OSSRH
     steps:
       - uses: actions/checkout@v2
       - name: Set up Java for publishing to Maven Central Repository
@@ -29,6 +29,6 @@ jobs:
           gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }} # Value of the GPG private key to import
       - name: Publish to the Maven Central Repository
         run: mvn --batch-mode deploy -P ossrh -Dmaven.test.skip=true
-        env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+      env:
+        OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+        OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
