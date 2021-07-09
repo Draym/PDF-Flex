@@ -1,10 +1,11 @@
 PDF-Flex [![CI](https://github.com/Draym/PDF-Flex/actions/workflows/ci-workflow.yml/badge.svg)](https://github.com/Draym/PDF-Flex/actions/workflows/ci-workflow.yml) [![GitHubPackage](https://github.com/Draym/PDF-Flex/actions/workflows/deploy-github-workflow.yml/badge.svg)](https://github.com/Draym/PDF-Flex/actions/workflows/deploy-github-workflow.yml) [![MavenCentral](https://github.com/Draym/PDF-Flex/actions/workflows/deploy-maven-workflow.yml/badge.svg)](https://github.com/Draym/PDF-Flex/actions/workflows/deploy-maven-workflow.yml)
 =======
 
-PDF-Flex is a library that can be used to easily compose responsive components within a PDF. It uses [Apache pdfbox](https://github.com/apache/pdfbox) as its root while
-abstracting the api into a harmonised set of tools and pre-defined components.
+PDF-Flex is a library that can be used to easily compose responsive components within a PDF. It uses [Apache pdfbox](https://github.com/apache/pdfbox) as its root while abstracting
+the api into a harmonised set of tools and pre-defined components.
 
-PDF-Flex is designed within a responsive system which allows the components within the PDF to adjust against each-others. Thanks to it, it's now easier to create complex design with generic and adjustable, both in width & height, component within a PDF.
+PDF-Flex is designed within a responsive system which allows the components within the PDF to adjust against each-others. Thanks to it, it's now easier to create complex design
+with generic and adjustable, both in width & height, component within a PDF.
 
 It allows easier usage of Paragraph, Table, Rows and support multi-page implementation.
 
@@ -32,233 +33,107 @@ It has been developed in an effort of creating a complete easy-to-use high-level
 
 # Maven
 
+The library is available in both maven central and github-packages. Simply add this dependency in your pom.xml or in your gradle config.
+
 ### Maven Central
-TODO
 
 ```xml
+
 <dependency>
-    <groupId></groupId>
-    <artifactId></artifactId>
-    <version>1.1.0</version>
+    <groupId>draym.github.io</groupId>
+    <artifactId>pdf-flex</artifactId>
+    <version>1.2.4</version>
 </dependency>
 ```
 
 ### Github Packages
 
+If you wish to use github-packages, you need to configure a global (or project based) GitHub
+authentication ([docs](https://docs.github.com/en/packages/learn-github-packages/installing-a-package)).
+
+For example, one way would be to create a read PAT token([github token](https://github.com/settings/tokens)) with **read:packages** and add the following in your .m2/settings.xml:
+
 ```xml
-    <dependency>
-        <groupId>com.andres_k.lib</groupId>
-        <artifactId>pdf-flex</artifactId>
-        <version>1.2.3</version>
-    </dependency>
+
+<server>
+    <id>github</id>
+    <username>{github_username}</username>
+    <password>{github_token}</password>
+</server>
+```
+
+then add the dependency in your project
+
+```xml
+
+<dependency>
+    <groupId>com.andres_k.lib</groupId>
+    <artifactId>pdf-flex</artifactId>
+    <version>1.2.4</version>
+</dependency>
 ```
 
 # Documentation
 
 The documentation is available on the [WIKI](https://github.com/Draym/pdf-flex/wiki). If you need help, please create an [issue](https://github.com/Draym/pdf-flex/issues).
 
-# Tutorial
+# Quick Start
 
-The default way to generate PDF using PDF-Flex is to follow the following steps:
+The most simple way of starting to generate pdf using PDF-Flex is to use the base class [PdfDocument](https://github.com/Draym/PDF-Flex/wiki/Base-Containers#pdfdocument)
 
-- create a template by extending the abstract base template **PDFBaseTemplate**
-- override the necessary methods to define the comportment of your template
-- build the template
-- provide an output using the provided factory **OutputBuilder** or use a custom one
-- you can now physically generate your PDF or upload it online
+A PdfDocument is an encapsulation of the pdf-box document, it will be in charge of rendering the final PDF by using the components we will provide.
 
-### Create a template
-
-Extend the default Template which defines the overall structure.
-
-````kotlin
-class MyTemplate() : PdfBaseTemplate() {
-    override fun getFontToLoad(): Map<EFont, TrueTypeFont>
-    override fun createHeader(): PdfHeader?
-    override fun createFooter(): PdfFooter?
-    override fun createPages(): List<PdfPage>
-    override fun getPdfDefaultProperties(): PdfProperties
-    override fun getPdfDefaultDebugSettings(): PdfContextDebug
-}
-````
-
-#### Define the font you wish to use
-
-- A fond is associated to a code, you will then use this code when creating a new component. This will allow the font to be saved only once in the builder and be used only when the
-  builder will write out the PDF.
-- For convenience, we usually use **BaseFont** which define default, bold and italic code. Still you can define and use as many Fonts as you wish within your document.
-
-- There are two ways to define fonts, by uploading custom one, or use the ones provided by apache/pdfbox
-    - custom Fonts use TrueTypeFont type, you can use the utility tools [FontUtils](https://github.com/Draym/pdf-flex/wiki/Tools#fontutil) to load your own font
-    - apache/pdfbox define a set of [standard font](https://pdfbox.apache.org/1.8/cookbook/workingwithfonts.html)
-
-````kotlin
-override fun includeCustomFonts(): Map<EFont, TrueTypeFont> {
-    return mapOf(
-        BaseFont.DEFAULT to FontUtils.loadTTCFont(YAHEI_CLASSIC.fontPath, YAHEI_CLASSIC.fontName),
-        BaseFont.BOLD to FontUtils.loadTTCFont(YAHEI_BOLD.fontPath, YAHEI_BOLD.fontName)
-    )
-}
-````
-
-````kotlin
-override fun includeStandardFonts(): Map<EFont, PDFont> {
-    return mapOf(
-        BaseFont.ITALIC to PDType1Font.TIMES_ITALIC
-    )
-}
-````
-
-#### Define the Header & Footer of your PDF: it will be displayed on each pages
-
-- a PdfHeader is simply a base container which hold a component. The most common way would be to put a Row component inside.
-- within the Row component you can then put anything you wish your header show.
-
-Let's see an example on how to create a logo header. Here we import an image as PDImageXObject thanks
-to [PdfImageLoader](https://github.com/Draym/pdf-flex/wiki/Tools#pdfimageloader) with an image file from the /resources folder.
-
-````kotlin
-override fun createHeader(): PdfHeader {
-    val logo: PDImageXObject = PdfImageLoader.loadFrom(document.document, "/images/logo.png")
-
-    // create an image component, the bodyAlign attribute will center the image into the row
-    val logoComponent = PdfImage(logo, respectParent = true, bodyAlign = BodyAlign.CENTER_LEFT)
-
-    // create a Row component
-    val headerContent = PdfRow(
-        // add an Image into the Row
-        elements = listOf(logoComponent),
-        maxHeight = SizeAttr.pixel(32f)
-    )
-    return PdfHeader(headerContent)
-}
-````
-
-#### Construct your pages
-
-Let's construct a PDF which contains a title, and a list of messages. Visit the [components wiki](https://github.com/Draym/pdf-flex/wiki/Core-Components) for more examples.
-
-````kotlin
-override fun createPages(): List<PdfPage> {
-    val fontB = BaseFont.BOLD.code
-
-    /** Title **/
-    // lets define a reusable configuration, you can specify this data at the component level aswell
-    val rtTxt = FConf(font = fontB, bodyAlign = BodyAlign.CENTER_CENTER, color = Color(90, 43, 129))
-
-    // let's define a title
-    val title = PdfText("Hello world!", fontSize = 17f).conf(rtTxt)
-
-    // add the title into the first row
-    val rowTitle = PdfRow(
-        elements = listOf(title),
-        margin = Spacing(top = 20f)
-    )
-
-    /** Paragraph **/
-    // now let's create some paragraph, the lines will be adjusted during the build to fit its parent width, if it overdraws, a new line will be created
-
-    // the default impl does not automatically handle the '\n' character, you have to split the lines ahead
-    val messages = listOf("This library is awesome.", "Let's try every available components.\nEnd of text.")
-    val paragraph1 = PdfParagraph(
-        lines = messages
-            .map { text ->
-                text.lines().map { PdfTextLine(PdfText(text = it, bodyAlign = BodyAlign.LEFT, font = BaseFont.DEFAULT.code, color = Color.BLACK)) }
-            }.flatten(),
-        bodyAlign = BodyAlign.TOP_LEFT
-    )
-
-    // you can also create a paragraph from a single String, it will handle the '\n' but offer less option on the TextComponent level
-    val flatMessage = "This library is awesome.\n Let's try every available components.\nEnd of text."
-    val paragraph2 = PdfParagraph(
-        text = flatMessage,
-        textAlign = BodyAlign.LEFT,
-        textFont = BaseFont.DEFAULT.code,
-        color = Color.BLACK,
-        bodyAlign = BodyAlign.TOP_LEFT
-    )
-
-    // If you put both paragraph into the row, and do not set paragraph width, by default it will take 100% of its parent /!\
-    // In order to put multiple expandable components, such as paragraph, into a row, we should use columns
-    val rowParagraph = PdfRow(
-        elements = listOf(
-          PdfCol(paragraph1, maxWidth = SizeAttr.percent(50f)),
-          PdfCol(paragraph2, maxWidth = SizeAttr.percent(50f))
-        ),
-        margin = Spacing(top = 20f)
-    )
-
-    /** Pages **/
-    // create a page with all the rows
-    val page1 = PdfPage(
-        elements = listOf(
-            rowTitle,
-            rowParagraph
-        ),
-        padding = Spacing(10f, 10f, 10f, 10f)
-    )
-    return listOf(page1)
-}
-````
-
-#### Define the settings and default variables
-
-You can define some settings to send to the Builder or keep the default one.
-
-````kotlin
-override fun getPdfDefaultProperties(): PdfProperties {
-    return PdfProperties(
-        defaultFontSize = 11f,
-        defaultInterline = 2f, // the size between each lines
-        debugOn = true, // if true it will draw additional lines such as container borders to help you debug your design, you can customize it using PdfContextDebug
-        color = Color.BLACK, // default component colors (font, border..)
-        drawOverflowX = true, // do not cut the components if they happen to draw on each other
-        drawOverflowY = true, // do not cut the components if they happen to draw on each other
-        createPageOnOverdraw = true // automatically create new pages
-    )
-}
-````
-
-You can also define how the visual DebugContext works by modifying the way it prints borders and background. Only the elements given into the Map will have additional printing. You
-must set debugOn = false into PdfProperties for final rendering.
-
-````kotlin
-override fun getPdfDefaultDebugSettings(): PdfContextDebug {
-    return PdfContextDebug(
-        borders = mapOf(
-            Type.ROW to Border(Color.RED.withAlpha(0.5f)),
-            Type.COL to Border(Color.BLUE.withAlpha(0.5f)),
-            Type.TABLE to Border(Color.PINK.withAlpha(0.7f))
-        ),
-        background = mapOf(
-            Type.COL to Color.CYAN.withAlpha(0.05f),
-            Type.TEXT to Color.LIGHT_GRAY.withAlpha(0.3f),
-            Type.PAGE_NB to Color.ORANGE.withAlpha(0.3f),
-            Type.PAGE_BREAK to Color.GREEN.withAlpha(0.3f)
-        )
-    )
-}
-````
-
-### Build your template
+Let's create a simple PDF containing a Header and a title.
 
 ```kotlin
-myTemplate.use { builder ->
+/** Initialise a new document */
+val drawer = PdfDocument()
+```
 
-    OutputBuilder.asByteArray().use { output ->
+```kotlin
+/** create a header for our document, it will be displayed at the top of each pages */
+val header = PdfHeader(content = PdfRow(PdfText("Header")))
 
-        // build the PDF in memory
-        // explorer will contains information on what has been actually created
-        val explorer = builder.build(output)
+/** create a text and set the display mode*/
+val title = PdfText(text = "I am a Title!", bodyAlign = BodyAlign.CENTER_CENTER)
 
-        // write the PDF into a byte array
-        val pdfAsBytes = output.get()
+/** create a container that will manage our text element */
+// by default a Row will occupy all its parent' width, here the page
+val row = PdfRow(
+    elements = listOf(title),
+    borders = Borders.ALL()
+)
 
-        // return the generated result data
-        PDFGeneratedWrapper(
-            pdf = pdfAsBytes,
-            explorer = explorer
+/** create a new page containing our row */
+val page1 = PdfPage(
+    elements = listOf(row),
+    padding = Spacing(10f, 20f, 10f, 20f)
+)
+```
+
+```kotlin
+val outputFile = File("test.pdf")
+
+/** we use the AutoCloseable feature in order to properly close our document */
+drawer.use { document ->
+
+    /** Create an PDF-Flex output, you can customise your output by extending OutputBuilder */
+    OutputBuilder.asFile(outputFile).use { output ->
+
+        /** we then 'draw' the PDF into our output (file, bytes...) */
+        // PdfDocument.draw will first compute all the pages and arrange the size and position of the components
+        // Next it will draw the calculated components into apache/pdf-box in-memory document using text and lines
+        // Then using apache/pdf-box it will render it into the output you provide
+        document.draw(
+            builder = output,
+            header = header,
+            pages = listOf(page1),
+            properties = PdfProperties.DEFAULT
         )
     }
 }
 ```
+
+# Tutorial
+
+#### - How to use PDF-Flex Template? [check here](https://github.com/Draym/PDF-Flex/wiki/TUTO:-use-Template)
